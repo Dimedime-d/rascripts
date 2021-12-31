@@ -830,7 +830,7 @@ get_items_cheevo("The Last Sacred Twins", "Final Chapter", 5, ["Garm", "Latona"]
 // Miscellaneous Juice
 
 protected_achievement(
-    title = "Imposter Destroyed",
+    title = "Impostor Destroyed",
     description = "In Chapter 16, let Nikita deal the killing blow to Orson",
     points = 10,
     trigger = remained_in_chapter_from_beginning("Chapter 16")
