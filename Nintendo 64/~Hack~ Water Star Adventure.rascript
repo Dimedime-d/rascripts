@@ -115,7 +115,7 @@ level_id__values = {
 course_names = {
     "Course 1": "Reflections of a Snowfall on a Warm Winter's Evening",
     "Course 2": "A proverb holds wisdom without hands",
-    "Course 3": "A cool breeze across the bow of the gallery",
+    "Course 3": "A cool breeze across the bow of the galley",
     "Course 4": "Within the heart you will find yourself",
     "Course 5": "Within the mind you find a friend",
     "Course 6": "Within your shadow hides your future",
