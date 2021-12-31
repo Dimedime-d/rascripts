@@ -235,11 +235,13 @@ function event_id_just_set(eid) {
     return just_increased(get_event_id(eid))
 }
 
-function protected_achievement(title, description, points, trigger) {
+function protected_achievement(title, description, points, trigger, id=0, badge="0") {
     achievement(title=title,
         description=description,
         points=points,
-        trigger=disable_when(current_turn() >= 1 && event_ids_set([CHEATING_EID], 1)) && unless(event_ids_set([CASUAL_EID])) && trigger
+        trigger=disable_when(current_turn() >= 1 && event_ids_set([CHEATING_EID], 1)) && unless(event_ids_set([CASUAL_EID])) && trigger,
+        id=id,
+        badge=badge
         )
 }
 
@@ -413,7 +415,7 @@ level_15_promoted_skills = {
 }
 
 
-function skill_cheevo(title, level_criteria, points, skill_list) {
+function skill_cheevo(title, level_criteria, points, skill_list, id=0, badge="0") {
     battle_anims_on_trig = 
         any_of(skill_list, skill => proc_is(battle_popup_proc__addr, "BattlePopup")
             && battle_popup_proc_skill_learned(battle_popup_proc__addr) == skill_list[skill])
@@ -427,13 +429,15 @@ function skill_cheevo(title, level_criteria, points, skill_list) {
         title=title,
         description=format("Make any unit learn a skill by training them to {0}.", level_criteria),
         points=points,
-        trigger=(battle_anims_on_trig || battle_anims_off_trig)
+        trigger=(battle_anims_on_trig || battle_anims_off_trig),
+        id=id,
+        badge=badge
     )
 }
 
-skill_cheevo("A Small Bonus Before Promotion", "Lv. 10 unpromoted", 2, level_10_unpromoted_skills)
-skill_cheevo("Another Power Spike", "Lv. 5 or Lv. 10 promoted", 5, level_5_promoted_skills)
-skill_cheevo("Serious Dedication", "Lv. 15 promoted", 10, level_15_promoted_skills)
+skill_cheevo("A Small Bonus Before Promotion", "Lv. 10 unpromoted", 2, level_10_unpromoted_skills, id=190038, badge="210894")
+skill_cheevo("Another Power Spike", "Lv. 5 or Lv. 10 promoted", 5, level_5_promoted_skills, id=190039, badge="210895")
+skill_cheevo("Serious Dedication", "Lv. 15 promoted", 10, level_15_promoted_skills, id=190040, badge="210896")
 
 dummy_achievement(
     title = "Live to Serve",
@@ -460,7 +464,7 @@ function remained_in_chapter_from_beginning(name) {
     return chapter_just_started(name) && never(turn_reset()) && never(event_ids_set([MAIN_LORD_DIED_EID]))}
 
 // In the event of a route split or variations of the same chapter (ex: Ch17-Final of vanilla FE8), just wrap the chapter checks around some any_of functions.
-function chapter_complete_cheevo(title, description, chap, points, next, difficult=0, flavor_text="") {
+function chapter_complete_cheevo(title, description, chap, points, next, difficult=0, flavor_text="", id=0, badge="0") {
     
     trig = remained_in_chapter_from_beginning(chap) && trigger_when(chapter_just_changed(chap, next))
     if (difficult != 0)
@@ -470,59 +474,76 @@ function chapter_complete_cheevo(title, description, chap, points, next, difficu
         title=title,
         description=format(description, chap) + flavor_text,
         points=points,
-        trigger=trig
+        trigger=trig,
+        id=id,
+        badge=badge
     )
 }
 
-function chapters_meta(title, description, points, next, flavor_text="") => {"title": title, "description": description, "points": points, "next": next, "flavor text": flavor_text}
+function chapters_meta(title, description, points, next, flavor_text="", id=0, badge="0") => {"title": title, "description": description, "points": points, "next": next, "flavor text": flavor_text, "id": id, "badge": badge}
 
 chapter_cheevo_infos = {
-    "Prologue":     chapters_meta("IT BEGINS", "Defeat O'Neill and seize the gate in the {0}.", 5, "Chapter 1", " Watch out for enemy skills!"),
-    "Chapter 1":    chapters_meta("Secret Chapter", "Escort Breguet to the village and seize the path in {0}.", 5, "Chapter 2"),  
-    "Chapter 2":    chapters_meta("The Bone Hole", "Do Bede a favor and seize the gate in {0}.", 5, "Chapter 3"),
-    "Chapter 3":    chapters_meta("Compile Proyect", "Slay Bazba Jenkins in {0}.", 5, "Chapter 4"),
-    "Chapter 4":    chapters_meta("Monkey Business", "Seize the Donateenary fort in {0}.", 5, "Chapter 5"),
-    "Chapter 5":    chapters_meta("Winter Invasion", "Fight through Saara's winter storm and seize the gate in {0}.", 10, "Chapter 6"),
-    "Chapter 6":    chapters_meta("Fort of Bad", "Defeat the generic armor knight and seize the throne in {0}.", 5, "Chapter 7"),
-    "Chapter 7":    chapters_meta("Port of Bad", "End Murray's donation demands by slaying him in {0}.", 5, "Chapter 8"),
-    "Chapter 8":    chapters_meta("Yet Another Chapter", "Help out Prine by routing the enemy in {0}.", 5, "Chapter 9"),
-    "Chapter 9":    chapters_meta("Tragic Backstory", "Avenge Edge's men by seizing the gate in {0}.", 5, "Chapter 10"),
-    "Chapter 10":    chapters_meta("here you like Men", "Rout the enemy in {0}.", 5, "Chapter 11", " One of them might be a friendly..."),
-    "Chapter 11":    chapters_meta("Factory Gold", "Seize the throne in {0}.", 5, "Chapter 12", " Take every droppable and stealable you can!"),
-    "Chapter 12":    chapters_meta("I Felt Sadistic", "Defeat both bosses in {0}.", 10, "Chapter 13", " Gheb really meant no harm..."),
-    "Chapter 13":    chapters_meta("Course. Rough. Irritating.", "Rout the enemy in {0}.", 5, "Chapter 14"),
-    "Chapter 14":    chapters_meta("Attack on Basement", "Overthrow Carlyle, the new Basement King, in {0}.", 5, "Chapter 15"),
-    "Chapter 15":    chapters_meta("The Shark Straits", "Defeat Grit and seize Blue Moon's HQ in {0}.", 10, "Chapter 16"),
-    "Chapter 16":    chapters_meta("Dead Valley", "Slay Orson in {0}.", 10, "Chapter 17"),
-    "Chapter 17":    chapters_meta("\'Slowly\' Corrupting", "Seize the throne in {0}.", 5, "Chapter 18"),
-    "Chapter 18":    chapters_meta("Island Clash", "Defeat Vigarde in {0}.", 5, "Chapter 19", " The filler arc begins..."),
-    "Chapter 19":    chapters_meta("Lit Chapter", "Seize Maeda's door in {0}.", 5, "Chapter 20"),
-    "Chapter 20":    chapters_meta("Great Rivalry", "Defeat Maeda and seize the throne in {0}.", 10, "Chapter 21"),
-    "Chapter 21":    chapters_meta("Doot Doot", "Slay Tatara of the Doma Faithful in {0}.", 5, "Chapter 22"),
-    "Chapter 22":    chapters_meta("N i c e B o a t s", "Defeat and recruit Celica in {0}.", 5, "Chapter 23"),
-    "Chapter 23":    chapters_meta("Flesh and Bone", "Seize Mr. Bones\'s spooky scary skeleton seat in {0}.", 10, "Chapter 24"),
-    "Chapter 24":    chapters_meta("River Rush", "Show Gwendolyn that she's a bad unit by defeating her in {0}.", 10, "Chapter 25"),
-    "Chapter 25":    chapters_meta("Shrine of Meals", "Defeat Banana and seize the throne in {0}.", 10, "Chapter 26"),
-    "Chapter 26":    chapters_meta("Darrman's Lakes", "Go deeper into Donateenary territory and seize the gate in {0}.", 10, "Chapter 27"),
-    "Chapter 27":    chapters_meta("Convenient Lake", "Seize the gate in {0}.", 10, "Chapter 28"),
-    "Chapter 28":    chapters_meta("Mess.jpg", "Regroup your army and seize the gate in {0}.", 10, "Chapter 29"),
-    "Chapter 29":    chapters_meta("Let It Be", "Kill Lyon in {0}.", 10, "Final Chapter"),
+    "Prologue":     chapters_meta("IT BEGINS", "Defeat O'Neill and seize the gate in the {0}.", 5, "Chapter 1", " Watch out for enemy skills!", id=190043, badge="210899"),
+    "Chapter 1":    chapters_meta("Secret Chapter", "Escort Breguet to the village and seize the path in {0}.", 5, "Chapter 2", id=190042, badge="210898"),  
+    "Chapter 2":    chapters_meta("The Bone Hole", "Do Bede a favor and seize the gate in {0}.", 5, "Chapter 3", id=190056, badge="210912"),
+    "Chapter 3":    chapters_meta("Compile Proyect", "Slay Bazba Jenkins in {0}.", 5, "Chapter 4", id=190066, badge="210922"),
+    "Chapter 4":    chapters_meta("Monkey Business", "Seize the Donateenary fort in {0}.", 5, "Chapter 5", id=190067, badge="210923"),
+    "Chapter 5":    chapters_meta("Winter Invasion", "Fight through Saara's winter storm and seize the gate in {0}.", 10, "Chapter 6", id=190068, badge="210924"),
+    "Chapter 6":    chapters_meta("Fort of Bad", "Defeat the generic armor knight and seize the throne in {0}.", 5, "Chapter 7", id=190069, badge="210925"),
+    "Chapter 7":    chapters_meta("Port of Bad", "End Murray's donation demands by slaying him in {0}.", 5, "Chapter 8", id=190070, badge="210926"),
+    "Chapter 8":    chapters_meta("Yet Another Chapter", "Help out Prine by routing the enemy in {0}.", 5, "Chapter 9", id=190071, badge="210927"),
+    "Chapter 9":    chapters_meta("Tragic Backstory", "Avenge Edge's men by seizing the gate in {0}.", 5, "Chapter 10", id=190072, badge="210928"),
+    "Chapter 10":    chapters_meta("here you like Men", "Rout the enemy in {0}.", 5, "Chapter 11", " One of them might be a friendly...", id=190046, badge="210902"),
+    "Chapter 11":    chapters_meta("Factory Gold", "Seize the throne in {0}.", 5, "Chapter 12", " Take every droppable and stealable you can!", id=190047, badge="210903"),
+    "Chapter 12":    chapters_meta("I Felt Sadistic", "Defeat both bosses in {0}.", 10, "Chapter 13", " Gheb really meant no harm...", id=190048, badge="210904"),
+    "Chapter 13":    chapters_meta("Course. Rough. Irritating.", "Rout the enemy in {0}.", 5, "Chapter 14", id=190049, badge="210905"),
+    "Chapter 14":    chapters_meta("Attack on Basement", "Overthrow Carlyle, the new Basement King, in {0}.", 5, "Chapter 15", id=190050, badge="210906"),
+    "Chapter 15":    chapters_meta("The Shark Straits", "Defeat Grit and seize Blue Moon's HQ in {0}.", 10, "Chapter 16", id=190051, badge="210907"),
+    "Chapter 16":    chapters_meta("Dead Valley", "Slay Orson in {0}.", 10, "Chapter 17", id=190052, badge="210908"),
+    "Chapter 17":    chapters_meta("\'Slowly\' Corrupting", "Seize the throne in {0}.", 5, "Chapter 18", id=190053, badge="210909"),
+    "Chapter 18":    chapters_meta("Island Clash", "Defeat Vigarde in {0}.", 5, "Chapter 19", " The filler arc begins...", id=190054, badge="210910"),
+    "Chapter 19":    chapters_meta("Lit Chapter", "Seize Maeda's door in {0}.", 5, "Chapter 20", id=190055, badge="210911"),
+    "Chapter 20":    chapters_meta("Great Rivalry", "Defeat Maeda and seize the throne in {0}.", 10, "Chapter 21", id=190057, badge="210913"),
+    "Chapter 21":    chapters_meta("Doot Doot", "Slay Tatara of the Doma Faithful in {0}.", 5, "Chapter 22", id=190027, badge="210883"),
+    "Chapter 22":    chapters_meta("N i c e B o a t s", "Defeat and recruit Celica in {0}.", 5, "Chapter 23", id=190058, badge="210914"),
+    "Chapter 23":    chapters_meta("Flesh and Bone", "Seize Mr. Bones\'s spooky scary skeleton seat in {0}.", 10, "Chapter 24", id=190059, badge="210915"),
+    "Chapter 24":    chapters_meta("River Rush", "Show Gwendolyn that she's a bad unit by defeating her in {0}.", 10, "Chapter 25", id=190060, badge="210916"),
+    "Chapter 25":    chapters_meta("Shrine of Meals", "Defeat Banana and seize the throne in {0}.", 10, "Chapter 26", id=190061, badge="210917"),
+    "Chapter 26":    chapters_meta("Darrman's Lakes", "Go deeper into Donateenary territory and seize the gate in {0}.", 10, "Chapter 27", id=190062, badge="210918"),
+    "Chapter 27":    chapters_meta("Convenient Lake", "Seize the gate in {0}.", 10, "Chapter 28", id=190063, badge="210919"),
+    "Chapter 28":    chapters_meta("Mess.jpg", "Regroup your army and seize the gate in {0}.", 10, "Chapter 29", id=190064, badge="210920"),
+    "Chapter 29":    chapters_meta("Let It Be", "Kill Lyon in {0}.", 10, "Final Chapter", id=190065, badge="210921"),
 }
 
 for chap in chapter_cheevo_infos {
-    chapter_complete_cheevo(chapter_cheevo_infos[chap]["title"], chapter_cheevo_infos[chap]["description"], chap, chapter_cheevo_infos[chap]["points"], chapter_cheevo_infos[chap]["next"], flavor_text=chapter_cheevo_infos[chap]["flavor text"])
+    chapter_complete_cheevo(chapter_cheevo_infos[chap]["title"], 
+    chapter_cheevo_infos[chap]["description"], 
+    chap, 
+    chapter_cheevo_infos[chap]["points"], 
+    chapter_cheevo_infos[chap]["next"], 
+    flavor_text=chapter_cheevo_infos[chap]["flavor text"], 
+    id=chapter_cheevo_infos[chap]["id"], 
+    badge=chapter_cheevo_infos[chap]["badge"])
 }
 
 difficult_chapters = {
-    "Chapter 5":    chapters_meta("The Frontloaded Earlygame", "Complete {0} on Difficult.", 25, "Chapter 6"),
-    "Chapter 12":   chapters_meta("The Random Difficulty Spikes", "Complete {0} on Difficult.", 25, "Chapter 13"),
-    "Chapter 16":   chapters_meta("Halfway Through the Mooks", "Complete {0} on Difficult.", 25, "Chapter 17"),
-    "Chapter 20":   chapters_meta("The Boring Midgame", "Complete {0} on Difficult.", 25, "Chapter 21"),
-    "Chapter 24":   chapters_meta("Quantity Over Quality", "Complete {0} on Difficult.", 25, "Chapter 25"),
+    "Chapter 5":    chapters_meta("The Frontloaded Earlygame", "Complete {0} on Difficult.", 25, "Chapter 6", id=190083, badge="210939"),
+    "Chapter 12":   chapters_meta("The Random Difficulty Spikes", "Complete {0} on Difficult.", 25, "Chapter 13", id=190080, badge="210936"),
+    "Chapter 16":   chapters_meta("Halfway Through the Mooks", "Complete {0} on Difficult.", 25, "Chapter 17", id=190091, badge="210947"),
+    "Chapter 20":   chapters_meta("The Boring Midgame", "Complete {0} on Difficult.", 25, "Chapter 21", id=190081, badge="210937"),
+    "Chapter 24":   chapters_meta("Quantity Over Quality", "Complete {0} on Difficult.", 25, "Chapter 25", id=190082, badge="210938"),
 }
 
 for chap in difficult_chapters {
-    chapter_complete_cheevo(difficult_chapters[chap]["title"], difficult_chapters[chap]["description"], chap, difficult_chapters[chap]["points"], difficult_chapters[chap]["next"], difficult=1, flavor_text=difficult_chapters[chap]["flavor text"])
+    chapter_complete_cheevo(difficult_chapters[chap]["title"], 
+    difficult_chapters[chap]["description"], 
+    chap, 
+    difficult_chapters[chap]["points"], 
+    difficult_chapters[chap]["next"], 
+    difficult=1, 
+    flavor_text=difficult_chapters[chap]["flavor text"], 
+    id=difficult_chapters[chap]["id"], 
+    badge=difficult_chapters[chap]["badge"])
 }
 
 // Final Chapter (One on not-casual, one on Difficult)
@@ -537,14 +558,18 @@ protected_achievement(
     title="Family Avenged",
     description="Slay the Demon King in the Final Chapter.",
     points=25,
-    trigger=demon_king_dead_in_final_chapter()
+    trigger=demon_king_dead_in_final_chapter(),
+    id=190086,
+    badge="210942"
 )
 
 protected_achievement(
     title="The Brutal Endgame",
     description="Complete the game on Difficult.",
     points=50,
-    trigger=demon_king_dead_in_final_chapter() && in_hard_mode()
+    trigger=demon_king_dead_in_final_chapter() && in_hard_mode(),
+    id=190087,
+    badge="210943"
 )
 
 // Full Recruitment
@@ -557,8 +582,10 @@ protected_achievement(
     trigger=all_of(range(1, 33), a => nth_unit_exists("player", a))
         && none_of(range(1, 33), a => nth_unit_dead("player", a))
         && none_of(range(1, 33), a => nth_unit_class_is("player", a, "phantom"))
-        && demon_king_dead_in_final_chapter()
+        && demon_king_dead_in_final_chapter(),
     // Indicator pops up when you're in final chapter with everyone recruited and alive
+    id=190088,
+    badge="210944"
 )
 
 battle_round_array__mem = 0x42ac0
@@ -578,7 +605,9 @@ protected_achievement(
     title="Cash Money Triangle",
     description="Perform a triangle attack with the three Anna's (see comment).",
     points=5,
-    trigger=performed_triangle_attack()
+    trigger=performed_triangle_attack(),
+    id=190090,
+    badge="210946"
 )
 
 // Secret Shops
@@ -587,20 +616,22 @@ function shop_proc_is_secret(addr) {
         && shop_proc_type(addr) == SECRET_SHOP
 }
 
-function secret_shop_cheevo(title, hint, chap, points, flavor_text="") {
+function secret_shop_cheevo(title, hint, chap, points, flavor_text="", id=0, badge="0") {
     trig=in_chapter(chap) && shop_proc_is_secret(main_proc_ptr(3)) // Allow suspend saves 'cause no indicator
     
     protected_achievement(
         title=title,
         description=format("Discover a secret shop {0}.{1}", hint, flavor_text),
         points=points,
-        trigger=trig
+        trigger=trig,
+        id=id,
+        badge=badge
     )
 }
 
-secret_shop_cheevo("A Friend's Place", "where Anna told you", "Chapter 15", 5, " You got your member card back, right?")
-secret_shop_cheevo("Spooky Scary Shop", "near some skeleton ships", "Chapter 23", 5)
-secret_shop_cheevo("By the River", "at a lone house in the middle of many, many red units", "Chapter 24", 5)
+secret_shop_cheevo("A Friend's Place", "where Anna told you", "Chapter 15", 5, " You got your member card back, right?", id=190074, badge="210930")
+secret_shop_cheevo("Spooky Scary Shop", "near some skeleton ships", "Chapter 23", 5, id=190075, badge="210931")
+secret_shop_cheevo("By the River", "at a lone house in the middle of many, many red units", "Chapter 24", 5, id=190076, badge="210932")
 
 
 //
@@ -649,14 +680,16 @@ protected_achievement(
     title = "Before You Get Overwhelmed",
     description = "In Chapter 6, open all 3 chests and seize the throne before Turn 14. Enemy thieves will not open chests.",
     points = 10,
-    trigger = ch6_special_clear_trigger()
+    trigger = ch6_special_clear_trigger(),
+    id=190077,
+    badge="210933"
 )
 
 //
 //  Recruitments
 //
 
-function recruitment_cheevo(title, char, chap, points, eids, check_suspend_point=0, check_menu=0, flavor_text="", additional_logic=always_true()){
+function recruitment_cheevo(title, char, chap, points, eids, check_suspend_point=0, check_menu=0, flavor_text="", additional_logic=always_true(), id=0, badge="0"){
     trig = remained_in_chapter_from_beginning(chap) && additional_logic && trigger_when(event_ids_set(eids, 1))
     if check_suspend_point == 1
         trig = trig && trigger_when(suspend_point_changed())
@@ -667,13 +700,15 @@ function recruitment_cheevo(title, char, chap, points, eids, check_suspend_point
         title=title,
         description=format("Recruit {0} in {1}.{2}", char, chap, flavor_text),
         points=points,
-        trigger=trig
+        trigger=trig,
+        id=id,
+        badge=badge
     )
 }
 
 // In the event that character recruitment can't be linked to an event id (ex: they must survive until the end of the chapter),
 // just check every possible player unit slot for that character
-function recruitment_cheevo_fallback(title, char, chap, points, num_units, flavor_text="", additional_logic=always_true()) {
+function recruitment_cheevo_fallback(title, char, chap, points, num_units, flavor_text="", additional_logic=always_true(), id=0, badge="0") {
     trig = remained_in_chapter_from_beginning(chap) && additional_logic
     
     // Void *always* takes up unit slot 0, in prep menus and beforehand
@@ -687,39 +722,39 @@ function recruitment_cheevo_fallback(title, char, chap, points, num_units, flavo
     )
 }
 
-recruitment_cheevo_fallback("Secret Seller", "Myrmidon Anna", "Chapter 1", 5, 1+6, flavor_text=" You'll get your Member Card back soon...") // finicky event ids
+recruitment_cheevo_fallback("Secret Seller", "Myrmidon Anna", "Chapter 1", 5, 1+6, flavor_text=" You'll get your Member Card back soon...", id=190015, badge="210871") // finicky event ids
     // really not gonna bother with reset-if-this-unit-dies logic for most of these, especially when the character can be easily recruited turn 1
 recruitment_cheevo("Renegade Translator", "Jay", "Chapter 3", 5, eids=[7], check_suspend_point=1, additional_logic=
-    never(tile_village_destroyed(6, 6)))   // village
+    never(tile_village_destroyed(6, 6)), id=190016, badge="210872")   // village
     // villages are less clear, so challenge indicator will go away when the respective village is destroyed
 recruitment_cheevo("Divine Lightning", "Not Arch", "Chapter 4", 5, eids=[7], check_suspend_point=1, additional_logic=
-    never(tile_village_destroyed(19, 9))) // village
-recruitment_cheevo("You What, Mate?", "Kirsten", "Chapter 5", 5, eids=[7], check_menu=1)   // talk
-recruitment_cheevo("The Builder", "Bob", "Chapter 6", 5, eids=[0x20], check_menu=1) // talk
+    never(tile_village_destroyed(19, 9)), id=190017, badge="210873") // village
+recruitment_cheevo("You What, Mate?", "Kirsten", "Chapter 5", 5, eids=[7], check_menu=1, id=190018, badge="210874")   // talk
+recruitment_cheevo("The Builder", "Bob", "Chapter 6", 5, eids=[0x20], check_menu=1, id=190019, badge="210875") // talk
 recruitment_cheevo("Former Wolfguard", "Roshea", "Chapter 7", 5, eids=[9], check_suspend_point=1, additional_logic=
-    never(tile_village_destroyed(19, 1))) // village
-recruitment_cheevo("Edgy Palette", "Edge", "Chapter 9", 5, eids=[7], check_menu=1) // talk
-recruitment_cheevo("The Confused", "Samson", "Chapter 10", 5, eids=[0x14], check_menu=1) // talk
-recruitment_cheevo("Sturdy General", "Tye", "Chapter 12", 5, eids=[7], check_menu=1) // talk
+    never(tile_village_destroyed(19, 1)), id=190020, badge="210876") // village
+recruitment_cheevo("Edgy Palette", "Edge", "Chapter 9", 5, eids=[7], check_menu=1, id=190021, badge="210877") // talk
+recruitment_cheevo("The Confused", "Samson", "Chapter 10", 5, eids=[0x14], check_menu=1, id=190022, badge="210878") // talk
+recruitment_cheevo("Sturdy General", "Tye", "Chapter 12", 5, eids=[7], check_menu=1, id=190023, badge="210879") // talk
     
-recruitment_cheevo("Mysterious Mage", "Celicia", "Chapter 13", 5, eids=[8], check_menu=1) // talk
-recruitment_cheevo("Basement King", "Eevster", "Chapter 14", 5, eids=[0x10], check_menu=1) // talk
-recruitment_cheevo("Another Anna", "Wyvern Anna", "Chapter 15", 5, eids=[0x0D], check_menu=1) // talk
+recruitment_cheevo("Mysterious Mage", "Celicia", "Chapter 13", 5, eids=[8], check_menu=1, id=190024, badge="210880") // talk
+recruitment_cheevo("Basement King", "Eevster", "Chapter 14", 5, eids=[0x10], check_menu=1, id=190025, badge="210881") // talk
+recruitment_cheevo("Another Anna", "Wyvern Anna", "Chapter 15", 5, eids=[0x0D], check_menu=1, id=190026, badge="210882") // talk
 recruitment_cheevo_fallback("Echoes Character", "Doot", "Chapter 21", 5, 21+6, additional_logic=
-    never(repeated(5, nth_unit_was("enemy", 1, "Doot") && nth_unit_is("enemy", 1, "Blank")))) // make survive until end
+    never(repeated(5, nth_unit_was("enemy", 1, "Doot") && nth_unit_is("enemy", 1, "Blank"))), id=190073, badge="210929") // make survive until end
     // added additional resets to make it clearer that you gotta keep these people alive
-recruitment_cheevo("Lycian Knight?", "Doowile", "Chapter 23", 5, eids=[0x08], check_menu=1) // talk
-recruitment_cheevo_fallback("What Next?", "Evil Florina", "Chapter 24", 5, 24+6, flavor_text=" Note: She pays you to join you.") // talk + gold offer
+recruitment_cheevo("Lycian Knight?", "Doowile", "Chapter 23", 5, eids=[0x08], check_menu=1, id=190031, badge="210887") // talk
+recruitment_cheevo_fallback("What Next?", "Evil Florina", "Chapter 24", 5, 24+6, flavor_text=" Note: She pays you to join you.", id=190032, badge="210888") // talk + gold offer
 recruitment_cheevo_fallback("Banana Slayer", "Bjorn", "Chapter 25", 5, 23+7, additional_logic=
-    never(repeated(5, nth_unit_was("npc", 0, "Bjorn") && nth_unit_is("npc", 0, "Blank")))) // make survive until end
+    never(repeated(5, nth_unit_was("npc", 0, "Bjorn") && nth_unit_is("npc", 0, "Blank"))), id=190028, badge="210884") // make survive until end
     // Just to be safe, check a couple more unit slots in case Phantoms are on the field, and they appear later in the player unit list
-recruitment_cheevo("Anna's Husband", "Jake", "Chapter 26", 5, eids=[7], check_menu=1) // talk
+recruitment_cheevo("Anna's Husband", "Jake", "Chapter 26", 5, eids=[7], check_menu=1, id=190029, badge="210885") // talk
 recruitment_cheevo_fallback("Mysterious Tactician", "Marf", "Chapter 27", 5, 27+7,  additional_logic=
-    never(tile_village_destroyed(17, 2))) // village without an event id
+    never(tile_village_destroyed(17, 2)), id=190030, badge="210886") // village without an event id
 
 // Villages - just check event ids
 // Enemies will never naturally visit villages (only destroy them), and I can easily protect against control enemy cheat.
-function village_cheevo(title, housing, chap, points, eids, flavor_text="", additional_logic=always_true()) {
+function village_cheevo(title, housing, chap, points, eids, flavor_text="", additional_logic=always_true(), id=0, badge="0") {
     trig = remained_in_chapter_from_beginning(chap) && additional_logic
         && trigger_when(event_ids_set(eids, 1) && suspend_point_changed())
     
@@ -727,21 +762,23 @@ function village_cheevo(title, housing, chap, points, eids, flavor_text="", addi
         title=title,
         description=format("Visit {2} in {0}.{1}", chap, flavor_text, housing),
         points=points,
-        trigger=trig
+        trigger=trig,
+        id=id,
+        badge=badge
     )
 }
 
 village_cheevo("Hey Look! A Thing!", "both villages", "Chapter 2", 5, eids=[8, 9], additional_logic=
-    never(tile_village_destroyed(14, 1)) && never(tile_village_destroyed(14, 10)))
+    never(tile_village_destroyed(14, 1)) && never(tile_village_destroyed(14, 10)), id=190033, badge="210889")
 village_cheevo("Just Barging In", "both villages", "Chapter 8", 5, eids=[6, 7], additional_logic=
-    never(tile_village_destroyed(2, 2)) && never(tile_village_destroyed(16, 9)))
-village_cheevo("More Free Stuff", "both houses", "Chapter 10", 5, eids=[0x12, 0x13])
+    never(tile_village_destroyed(2, 2)) && never(tile_village_destroyed(16, 9)), id=190034, badge="210890")
+village_cheevo("More Free Stuff", "both houses", "Chapter 10", 5, eids=[0x12, 0x13], id=190035, badge="210891")
 village_cheevo("Gifts from Wars World", "the village and both houses", "Chapter 15", 5, eids=[0x0A, 0x0B, 0x0C], additional_logic=
-    never(tile_village_destroyed(4, 13)))
+    never(tile_village_destroyed(4, 13)), id=190036, badge="210892")
 village_cheevo("The Other River Folk", "both villages", "Chapter 24", 5, eids=[0x07, 0x08], flavor_text=" All these enemies and no wyverns to use these weapons on!", additional_logic=
-    never(tile_village_destroyed(13, 1)) && never(tile_village_destroyed(1, 7)))
+    never(tile_village_destroyed(13, 1)) && never(tile_village_destroyed(1, 7)), id=190089, badge="210945")
 village_cheevo("Even More Lore", "every village", "Chapter 26", 5, eids=[0x08, 0x09, 0x10], additional_logic=
-    never(tile_village_destroyed(11, 7)) && never(tile_village_destroyed(2, 15)) && never(tile_village_destroyed(19, 12)))
+    never(tile_village_destroyed(11, 7)) && never(tile_village_destroyed(2, 15)) && never(tile_village_destroyed(19, 12)), id=190037, badge="210893")
 
 //
 //  Got Items
@@ -772,7 +809,7 @@ function got_items_triggered_and_measured(item_list, chap) {
     return trigger_when(tally(length(item_list), arr)) || measured(tally(length(item_list), arr), when=in_chapter(chap))
 }
 
-function get_items_cheevo(title, chap, points, item_list, flavor_text="") {
+function get_items_cheevo(title, chap, points, item_list, flavor_text="", id=0, badge="0") {
     chapter = chap
     if (chap == "Prologue" || chap == "Final Chapter") {
         chapter = format("the {0}", chap)
@@ -785,10 +822,10 @@ function get_items_cheevo(title, chap, points, item_list, flavor_text="") {
     )
 }
 
-get_items_cheevo("Sadistic Treasure Hunt", "Chapter 12", 10, ["Blue Gem", "Hero Crest", "Guiding Ring", "Speedwings", "Boots", "Berserk"])
-get_items_cheevo("Corrupting Treasure Trove", "Chapter 17", 3, ["Nidhogg", "Door Key"], flavor_text=" Where did the draco zombie go?")
-get_items_cheevo("Maeda's Loot", "Chapter 20", 5, ["Boots", "Hero Crest", "Elysian Whip"])
-get_items_cheevo("The Last Sacred Twins", "Final Chapter", 5, ["Garm", "Latona"], flavor_text=" Got the weapon ranks to use them?")
+get_items_cheevo("Sadistic Treasure Hunt", "Chapter 12", 10, ["Blue Gem", "Hero Crest", "Guiding Ring", "Speedwings", "Boots", "Berserk"], id=190041, badge="210897")
+get_items_cheevo("Corrupting Treasure Trove", "Chapter 17", 3, ["Nidhogg", "Door Key"], flavor_text=" Where did the draco zombie go?", id=190044, badge="210900")
+get_items_cheevo("Maeda's Loot", "Chapter 20", 5, ["Boots", "Hero Crest", "Elysian Whip"], id=190045, badge="210901")
+get_items_cheevo("The Last Sacred Twins", "Final Chapter", 5, ["Garm", "Latona"], flavor_text=" Got the weapon ranks to use them?", id=190084, badge="210940")
 
 // Miscellaneous Juice
 
@@ -800,7 +837,9 @@ protected_achievement(
     && never(turn_reset())
     && trigger_when(event_id_just_set(BOSS_DEATH_QUOTE_EID))
     && (trigger_when(battle_actor_unit_is("Nikita"))
-    || trigger_when(battle_target_unit_is("Nikita"))) // In case he kills by counterattacking
+    || trigger_when(battle_target_unit_is("Nikita"))), // In case he kills by counterattacking
+    id=190078,
+    badge="210934"
 )
 
 protected_achievement(
@@ -808,7 +847,9 @@ protected_achievement(
     description = "In Chapter 15, win a battle at the arena. A reminder that skills and rallies will work in arena battles!",
     points = 5,
     trigger = remained_in_chapter_from_beginning("Chapter 15")
-    && trigger_when(arena_battle_won())
+    && trigger_when(arena_battle_won()),
+    id=190079,
+    badge="210935"
 )
 
 protected_achievement(
@@ -816,7 +857,9 @@ protected_achievement(
     description = "In Chapter 28, win a battle at the arena.",
     points = 5,
     trigger = remained_in_chapter_from_beginning("Chapter 28")
-    && trigger_when(arena_battle_won())
+    && trigger_when(arena_battle_won()),
+    id=190085, 
+    badge="210941"
 )
 
 //-------
