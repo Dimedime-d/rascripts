@@ -70,7 +70,7 @@ unit_ptrs = {
     "Myrmidon Anna":0x08803E68,
     "Nikita":       0x088041A8,
     "Doot":         0x088042AC,
-    "Evil Florina": 0x08804348, // tfw your name is too long, it breaks the deployment menu
+    "Evil Florina": 0x08804348, // tfw your name is so long, it breaks the deployment menu
     "Bjorn":        0x0880437C,
     "Marf":         0x088043E4,
     
@@ -342,20 +342,20 @@ function battle_popup_proc_skill_learned(addr) => word(addr + 0x4e)
 // Fortunately, none of these skills should be duplicated across different level up sets (ex: Live to Serve is only ever acquired at lv 10 unpromoted, no other levels)
 level_10_unpromoted_skills = {
     "Aether":           16, // Ephraim Lord (also Void's personal skill)
-    "Rightful King":    128, // Eirika Lord (Void)
+    "Rightful King":    128,// Eirika Lord (Void)
     "Elbow Room":       99, // Cavalier
-    "Natural Cover":    100, // Armor Knight
-    "Acrobat":          1, // Thief
+    "Natural Cover":    100,// Armor Knight
+    "Acrobat":          1,  // Thief
     "Spur Speed":       60, // Mercenary
     "Vantage":          32, // Myrmidon
-    "Sure Shot":        5, // Archer
+    "Sure Shot":        5,  // Archer
     "Tantivy":          91, // Wyvern Rider
     "Adept":            10, // Mage
     "Spur Defense":     61, // Shaman/Manakete, the latter of which is already leveled past 10
     "Desperation":      33, // Fighter
     "Intimidate":       84, // Brigand
-    "Seal Skill":       102, // Pirate
-    "Seal Resistance":  106, // Monk
+    "Seal Skill":       102,// Pirate
+    "Seal Resistance":  106,// Monk
     "Live To Serve":    79, // Priest/Cleric
     "Rally Speed":      71, // Peg Knight
     "Voice of Peace":   56, // Troubador
@@ -718,7 +718,9 @@ function recruitment_cheevo_fallback(title, char, chap, points, num_units, flavo
         title=title,
         description=format("Recruit {0} in {1}.{2}", char, chap, flavor_text),
         points=points,
-        trigger=trig && trigger_when(unit_check)
+        trigger=trig && trigger_when(unit_check),
+        id=id,
+        badge=badge
     )
 }
 
@@ -792,12 +794,11 @@ function popup_proc_player_got_item(proc, item_name) { // takes in a 6c address 
 // Lacking functionality for duplicate items, and situations where thieves can steal your items
 // Likely resolvable with some deltas and subhits, but I don't have to worry about those cases for this hack...
 
-// Also gotta figure out how to handle gold + recruitable thieves (Chapter 6)
 function got_items_triggered_and_measured(item_list, chap) {
     arr = []
     popup_proc_from_map_event   = proc_first_child_ptr(proc_first_child_ptr(main_proc_ptr(3))) //chest/village
     popup_proc_from_steal       = proc_first_child_ptr(main_proc_ptr(3)) //steal from enemy thief
-    popup_proc_from_pp_fight    = proc_first_child_ptr(proc_first_child_ptr(proc_first_child_ptr(proc_first_child_ptr(main_proc_ptr(2))))) //kill enemy thief
+    popup_proc_from_pp_fight    = proc_first_child_ptr(proc_first_child_ptr(proc_first_child_ptr(proc_first_child_ptr(main_proc_ptr(2))))) //kill enemy thief on player phase
     popup_proc_from_bp_fight    = proc_first_child_ptr(proc_first_child_ptr(proc_first_child_ptr(proc_first_child_ptr(proc_first_child_ptr(proc_first_child_ptr(proc_first_child_ptr(main_proc_ptr(2)))))))) //counterattack and kill enemy thief when thief is berserked - 8 nested procs, yeah...
     
     for item_name in item_list {
@@ -865,6 +866,7 @@ protected_achievement(
 //-------
 // b w l
 //-------
+
 battle_stats__struct = {
     "losses":           0x00, // byte
     "learned skills":   0x01, // 4 bytes
@@ -901,17 +903,13 @@ function nth_battle_stats_wins(index) => battle_stats_wins(nth_battle_stats(inde
 function nth_battle_stats_battles(index) => battle_stats_battles(nth_battle_stats(index))
 
 function sum_stats(stat) {
-    sum = 0
     stat_dict = {
         "losses":   nth_battle_stats_losses,
         "wins":     nth_battle_stats_wins,
         "battles":  nth_battle_stats_battles,
     }
     stat_func = stat_dict[stat]
-    for i in range(0, 35) {
-        sum = sum + stat_func(i)
-    }
-    return sum
+    return sum_of(range(0, 35), i => stat_func(i))
 }
 
 //-----
