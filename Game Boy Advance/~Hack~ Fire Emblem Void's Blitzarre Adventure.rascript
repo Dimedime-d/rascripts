@@ -79,7 +79,8 @@ unit_ptrs = {
 
 function unit_exists(addr) => unit_character(addr) != 0
 function unit_is(addr, name) => unit_character(addr) == unit_ptrs[name]
-function unit_was(addr, name) => prior(unit_character(addr)) == unit_ptrs[name] // Prior for some repeated() calls in some resets to check if a recruitable character was killed, such that the reset would trigger after the recruitment
+function unit_was_just(addr, name) => prev(unit_character(addr)) == unit_ptrs[name]
+function unit_was(addr, name) => prior(unit_character(addr)) == unit_ptrs[name]
 
 function unit_dead(addr) => bit(2, unit_field(addr, "state")) != 0
 
@@ -186,6 +187,7 @@ function nth_unit(faction, index) => unit_array[faction] + (index * unit__sizeof
 
 function nth_unit_exists(faction, index) => unit_exists(nth_unit(faction, index))
 function nth_unit_is(faction, index, name) => unit_is(nth_unit(faction, index), name)
+function nth_unit_was_just(faction, index, name) => unit_was_just(nth_unit(faction, index), name)
 function nth_unit_was(faction, index, name) => unit_was(nth_unit(faction, index), name)
 
 function nth_unit_dead(faction, index) => unit_dead(nth_unit(faction, index))
@@ -743,12 +745,12 @@ recruitment_cheevo("Mysterious Mage", "Celicia", "Chapter 13", 5, eids=[8], chec
 recruitment_cheevo("Basement King", "Eevster", "Chapter 14", 5, eids=[0x10], check_menu=1, id=190025, badge="210881") // talk
 recruitment_cheevo("Another Anna", "Wyvern Anna", "Chapter 15", 5, eids=[0x0D], check_menu=1, id=190026, badge="210882") // talk
 recruitment_cheevo_fallback("Echoes Character", "Doot", "Chapter 21", 5, 21+6, additional_logic=
-    never(repeated(5, nth_unit_was("enemy", 1, "Doot") && nth_unit_is("enemy", 1, "Blank"))), id=190073, badge="210929") // make survive until end
+    never(repeated(5, nth_unit_was_just("enemy", 1, "Doot") && nth_unit_is("enemy", 1, "Blank"))), id=190073, badge="210929") // make survive until end
     // added additional resets to make it clearer that you gotta keep these people alive
 recruitment_cheevo("Lycian Knight?", "Doowile", "Chapter 23", 5, eids=[0x08], check_menu=1, id=190031, badge="210887") // talk
 recruitment_cheevo_fallback("What Next?", "Evil Florina", "Chapter 24", 5, 24+6, flavor_text=" Note: She pays you to join you.", id=190032, badge="210888") // talk + gold offer
 recruitment_cheevo_fallback("Banana Slayer", "Bjorn", "Chapter 25", 5, 23+7, additional_logic=
-    never(repeated(5, nth_unit_was("npc", 0, "Bjorn") && nth_unit_is("npc", 0, "Blank"))), id=190028, badge="210884") // make survive until end
+    never(repeated(5, nth_unit_was_just("npc", 0, "Bjorn") && nth_unit_is("npc", 0, "Blank"))), id=190028, badge="210884") // make survive until end
     // Just to be safe, check a couple more unit slots in case Phantoms are on the field, and they appear later in the player unit list
 recruitment_cheevo("Anna's Husband", "Jake", "Chapter 26", 5, eids=[7], check_menu=1, id=190029, badge="210885") // talk
 recruitment_cheevo_fallback("Mysterious Tactician", "Marf", "Chapter 27", 5, 27+7,  additional_logic=
