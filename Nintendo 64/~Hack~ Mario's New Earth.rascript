@@ -761,7 +761,7 @@ achievement(
 
 achievement(
     title="Dicey Secrets Flight",
-    description="In Course 12, collect the secrets star without dying or picking up more than one wing cap (Re-enter Course 12 to try again).",
+    description="In Course 12, collect the secrets star without refreshing your wing cap (Re-enter Course 12 to try again).",
     points=5,
     trigger=never(!in_level("Course 12")) && once(in_level("Overworld 3", check_sublevels=0, delta=1))
         && never(mario_anim_is("death exit landing")) 
