@@ -580,7 +580,9 @@ achievement(
 // s w i t c h e s
 
 function rgb_trigger() {
-    return tally(2, 
+    return level_id__mem == prev(level_id__mem) // to prevent switching files after the ending picture puts you back to the title screen...
+    
+    && tally(2, 
     [once(pressed_switch("red", "true")),
     once(pressed_switch("green", "true")),
     once(pressed_switch("blue", "true"))
