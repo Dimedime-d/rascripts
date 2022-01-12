@@ -655,10 +655,10 @@ achievement(
     trigger= never(!in_level("Course 4")) && once(dialog_just_ended("Whomp Fight Start"))
         && never(hp() < prev(hp())) // no water damage to take...
         && never(boss_music_ended()) // boss music persists through defeat quote...
-        && trigger_when(object_is(used_object(), "king whomp") // there are no other objects in the boss arena that appear to update this used object...
+        && (trigger_when(object_is(used_object(), "king whomp") // there are no other objects in the boss arena that appear to update this used object...
             && prev(object_king_whomp_hp(used_object())) == 1
-            && object_king_whomp_hp(used_object()) == 0
-        ),
+            && object_king_whomp_hp(used_object()) == 0)
+        || trigger_when(dialog_id_is("Whomp Fight Defeat"))),
     id=190507,
     badge="211376"
 )
