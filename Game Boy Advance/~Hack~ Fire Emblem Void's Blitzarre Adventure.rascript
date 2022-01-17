@@ -437,7 +437,7 @@ function skill_cheevo(title, level_criteria, points, skill_list, id=0, badge="0"
     )
 }
 
-skill_cheevo("A Small Bonus Before Promotion", "Lv. 10 unpromoted", 2, level_10_unpromoted_skills, id=190038, badge="210894")
+skill_cheevo("A Small Bonus Before Promotion", "Lv. 10 unpromoted", 5, level_10_unpromoted_skills, id=190038, badge="210894")
 skill_cheevo("Another Power Spike", "Lv. 5 or Lv. 10 promoted", 5, level_5_promoted_skills, id=190039, badge="210895")
 skill_cheevo("Serious Dedication", "Lv. 15 promoted", 10, level_15_promoted_skills, id=190040, badge="210896")
 
@@ -496,7 +496,7 @@ chapter_cheevo_infos = {
     "Chapter 8":    chapters_meta("Yet Another Chapter", "Help out Prine by routing the enemy in {0}.", 5, "Chapter 9", id=190071, badge="210927"),
     "Chapter 9":    chapters_meta("Tragic Backstory", "Avenge Edge's men by seizing the gate in {0}.", 5, "Chapter 10", id=190072, badge="210928"),
     "Chapter 10":    chapters_meta("here you like Men", "Rout the enemy in {0}.", 5, "Chapter 11", " One of them might be a friendly...", id=190046, badge="210902"),
-    "Chapter 11":    chapters_meta("Factory Gold", "Seize the throne in {0}.", 5, "Chapter 12", " Take every droppable and stealable you can!", id=190047, badge="210903"),
+    "Chapter 11":    chapters_meta("Factory Gold", "Seize the throne in {0}.", 10, "Chapter 12", " Take every droppable and stealable you can!", id=190047, badge="210903"),
     "Chapter 12":    chapters_meta("I Felt Sadistic", "Defeat both bosses in {0}.", 10, "Chapter 13", " Gheb really meant no harm...", id=190048, badge="210904"),
     "Chapter 13":    chapters_meta("Course. Rough. Irritating.", "Rout the enemy in {0}.", 5, "Chapter 14", id=190049, badge="210905"),
     "Chapter 14":    chapters_meta("Attack on Basement", "Overthrow Carlyle, the new Basement King, in {0}.", 5, "Chapter 15", id=190050, badge="210906"),
@@ -506,8 +506,8 @@ chapter_cheevo_infos = {
     "Chapter 18":    chapters_meta("Island Clash", "Defeat Vigarde in {0}.", 5, "Chapter 19", " The filler arc begins...", id=190054, badge="210910"),
     "Chapter 19":    chapters_meta("Lit Chapter", "Seize Maeda's door in {0}.", 5, "Chapter 20", id=190055, badge="210911"),
     "Chapter 20":    chapters_meta("Great Rivalry", "Defeat Maeda and seize the throne in {0}.", 10, "Chapter 21", id=190057, badge="210913"),
-    "Chapter 21":    chapters_meta("Doot Doot", "Slay Tatara of the Doma Faithful in {0}.", 5, "Chapter 22", id=190027, badge="210883"),
-    "Chapter 22":    chapters_meta("N i c e B o a t s", "Defeat and recruit Celica in {0}.", 5, "Chapter 23", id=190058, badge="210914"),
+    "Chapter 21":    chapters_meta("Doot Doot", "Slay Tatara of the Doma Faithful in {0}.", 10, "Chapter 22", id=190027, badge="210883"),
+    "Chapter 22":    chapters_meta("N i c e B o a t s", "Defeat and recruit Celica in {0}.", 10, "Chapter 23", id=190058, badge="210914"),
     "Chapter 23":    chapters_meta("Flesh and Bone", "Seize Mr. Bones\'s spooky scary skeleton seat in {0}.", 10, "Chapter 24", id=190059, badge="210915"),
     "Chapter 24":    chapters_meta("River Rush", "Show Gwendolyn that she's a bad unit by defeating her in {0}.", 10, "Chapter 25", id=190060, badge="210916"),
     "Chapter 25":    chapters_meta("Shrine of Meals", "Defeat Banana and seize the throne in {0}.", 10, "Chapter 26", id=190061, badge="210917"),
@@ -826,7 +826,7 @@ function get_items_cheevo(title, chap, points, item_list, flavor_text="", id=0, 
 }
 
 get_items_cheevo("Sadistic Treasure Hunt", "Chapter 12", 10, ["Blue Gem", "Hero Crest", "Guiding Ring", "Speedwings", "Boots", "Berserk"], id=190041, badge="210897")
-get_items_cheevo("Corrupting Treasure Trove", "Chapter 17", 3, ["Nidhogg", "Door Key"], flavor_text=" Where did the draco zombie go?", id=190044, badge="210900")
+get_items_cheevo("Corrupting Treasure Trove", "Chapter 17", 5, ["Nidhogg", "Door Key"], flavor_text=" Where did the draco zombie go?", id=190044, badge="210900")
 get_items_cheevo("Maeda's Loot", "Chapter 20", 5, ["Boots", "Hero Crest", "Elysian Whip"], id=190045, badge="210901")
 get_items_cheevo("The Last Sacred Twins", "Final Chapter", 5, ["Garm", "Latona"], flavor_text=" Got the weapon ranks to use them?", id=190084, badge="210940")
 
