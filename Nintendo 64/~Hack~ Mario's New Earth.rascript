@@ -227,44 +227,44 @@ level_id__mem = byte(level_id__addr)
 function course_meta(value, sublevel_values, full_name) => {"value": value, "sublevel values": sublevel_values, "full name": full_name}
 
 course_infos = {
-    "Overworld 1":      course_meta(0x10, -1,   "The first Overworld"), // Castle Grounds
+    "Overworld 1":      course_meta(0x10, [-1],   "The first Overworld"), // Castle Grounds
     "Overworld 2":      course_meta(0x06, [0x02], "The second Overworld"), // Inside Castle
     "Overworld 3":      course_meta(0x1a, [0x01, 0x02, 0x03, 0x04], "The third Overworld"), // Castle Courtyard
     "Overworld Tunnel": course_meta(0x1a, [0x05], "Space Tunnel"), // Castle Courtyard SHARED
     
-    "Course 1":         course_meta(0x09, -1,   "Poly-Hued Hills"),
-    "Course 2":         course_meta(0x18, -1,   "Underground Shafts"),
-    "Course 3":         course_meta(0x0c, -1,   "Red Ruby Desert"),
-    "Course 4":         course_meta(0x05, -1,   "Surreal Rainbow Fantasy"),
-    "Course 5":         course_meta(0x04, -1,   "Murky Haunted Village"),
-    "Course 6":         course_meta(0x07, -1,   "Summer Island"),
-    "Course 7":         course_meta(0x16, -1,   "Blue Lava Lagoon"),
-    "Course 8":         course_meta(0x08, -1,   "Mushroom Mountains"),
-    "Course 9":         course_meta(0x17, -1,   "Shivering Snowland"),
-    "Course 10":        course_meta(0x0a, -1,   "Ancient Earth Temple"),
-    "Course 11":        course_meta(0x0b, -1,   "Silent West"),
-    "Course 12":        course_meta(0x24, -1,   "(perished) Dice Town"),
-    "Course 13":        course_meta(0x0d, -1,   "Computer Simulation"),
-    "Course 14":        course_meta(0x0e, -1,   "Earth Skies"),
-    "Course 15":        course_meta(0x0f, -1,   "Forbidden Reality"),
+    "Course 1":         course_meta(0x09, [-1],   "Poly-Hued Hills"),
+    "Course 2":         course_meta(0x18, [-1],   "Underground Shafts"),
+    "Course 3":         course_meta(0x0c, [-1],   "Red Ruby Desert"),
+    "Course 4":         course_meta(0x05, [-1],   "Surreal Rainbow Fantasy"),
+    "Course 5":         course_meta(0x04, [-1],   "Murky Haunted Village"),
+    "Course 6":         course_meta(0x07, [-1],   "Summer Island"),
+    "Course 7":         course_meta(0x16, [-1],   "Blue Lava Lagoon"),
+    "Course 8":         course_meta(0x08, [-1],   "Mushroom Mountains"),
+    "Course 9":         course_meta(0x17, [-1],   "Shivering Snowland"),
+    "Course 10":        course_meta(0x0a, [-1],   "Ancient Earth Temple"),
+    "Course 11":        course_meta(0x0b, [-1],   "Silent West"),
+    "Course 12":        course_meta(0x24, [-1],   "(perished) Dice Town"),
+    "Course 13":        course_meta(0x0d, [-1],   "Computer Simulation"),
+    "Course 14":        course_meta(0x0e, [-1],   "Earth Skies"),
+    "Course 15":        course_meta(0x0f, [-1],   "Forbidden Reality"),
     
-    "Trials":           course_meta(0x1f, -1,   "Tricky Temple Trials"),
-    "Quiz":             course_meta(0x1b, -1,   "The Ultimate Quiz"),
+    "Trials":           course_meta(0x1f, [-1],   "Tricky Temple Trials"),
+    "Quiz":             course_meta(0x1b, [-1],   "The Ultimate Quiz"),
     
-    "Bowser 1":         course_meta(0x11, -1,   "Bowser's Skyscrapers"),
-    "Key 1":            course_meta(0x1e, -1,   "Bowser's Skyscrapers"),
-    "Bowser 2":         course_meta(0x13, -1,   "Bowser's Retro Castle"),
-    "Key 2":            course_meta(0x21, -1,   "Bowser's Retro Castle"),
-    "Bowser 3":         course_meta(0x15, -1,   "Bowser's Fransium Factory"),
-    "Final Fight":      course_meta(0x22, -1,   "Bowser's Fransium Factory"),
-    "Metal Cap":        course_meta(0x1c, -1,   "Pixel's Magmatic Cavern"),
-    "Wing Cap":         course_meta(0x1d, -1,   "Thick Cloud Station"),
-    "Vanish Cap":       course_meta(0x12, -1,   "Library Dimension"),
+    "Bowser 1":         course_meta(0x11, [-1],   "Bowser's Skyscrapers"),
+    "Key 1":            course_meta(0x1e, [-1],   "Bowser's Skyscrapers"),
+    "Bowser 2":         course_meta(0x13, [-1],   "Bowser's Retro Castle"),
+    "Key 2":            course_meta(0x21, [-1],   "Bowser's Retro Castle"),
+    "Bowser 3":         course_meta(0x15, [-1],   "Bowser's Fransium Factory"),
+    "Final Fight":      course_meta(0x22, [-1],   "Bowser's Fransium Factory"),
+    "Metal Cap":        course_meta(0x1c, [-1],   "Pixel's Magmatic Cavern"),
+    "Wing Cap":         course_meta(0x1d, [-1],   "Thick Cloud Station"),
+    "Vanish Cap":       course_meta(0x12, [-1],   "Library Dimension"),
     
     "Happy End":        course_meta(0x06, [0x01], "The End"),
-    "End Cake Picture": course_meta(0x19, -1, "The End"),
+    "End Cake Picture": course_meta(0x19, [-1], "The End"),
     
-    "The Void":         course_meta(0x14, -1,   "The Void"), // Aquarium
+    "The Void":         course_meta(0x14, [-1],   "The Void"), // Aquarium
     "Void End":         course_meta(0x06, [0x03], "Destroyed Universe"), // Inside Castle SHARED
 }
 
@@ -284,7 +284,7 @@ function in_level(name, check_sublevels=1, delta=0) {
 }
 
 function in_sublevel(name) {
-    if course_infos[name]["sublevel values"] == -1 {return always_true()}
+    if (course_infos[name]["sublevel values"][0] == -1) {return always_true()}
     return any_of(course_infos[name]["sublevel values"], a => sublevel_id__mem == a)
 }
 
@@ -670,7 +670,7 @@ achievement(
     trigger= never(!in_level("Course 5")) && once(in_level("Overworld 1", delta=1))
         && never(object_is(stood_on_object(), "blue coin block") && mario_anim_is("ground pound landing"))
         && never(mario_anim_is("death exit landing"))
-        && trigger_when(just_collected_star_no_exit(7)),
+        && just_collected_star_general(star_index=7, trigger=1),
     id=190525,
     badge="211394"
 )
