@@ -194,6 +194,8 @@ function just_collected_star_general(star_index=-1, trigger=0) {
     if (trigger != 0)
         cond = any_of(star_dance_values, a => trigger_when(mario_anim_changed_to(a)))
     if (star_index != -1)
+        if (trigger != 0)
+            return cond && trigger_when(last_star__mem == star_index)
         return cond && last_star__mem == star_index
     return cond
 }
