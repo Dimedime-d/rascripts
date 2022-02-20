@@ -455,11 +455,11 @@ function level_loaded() => repeated(2, hud_stars_shown() == 1) && unless(hud_sta
 function course_stars_meta(save_offset, points, title, id=0, badge="0") => {"save offset": save_offset, "points": points, "title": title, "id": id, "badge": badge}
 
 course_offsets = { // bytes offset from start of EEPROM, handle secret stars separately...
-    1:  course_stars_meta(0x0f, 10, "Lots of Enemies in this Valley", id=198863, badge="220971"),
-    2:  course_stars_meta(0x0e, 10, "Ruined Snowscape",               id=198864, badge="220972"),
-    3:  course_stars_meta(0x0d, 10, "Conquered the Badlands",         id=198865, badge="220973"),
-    4:  course_stars_meta(0x0c, 10, "Plumbing Work",                  id=198866, badge="220974"),
-    5:  course_stars_meta(0x13, 10, "Hotty Hot Exploration",          id=198867, badge="220975"),
+    1:  course_stars_meta(0x0f, 10, "Lots of Enemies in this Valley", id=198863, badge="221306"),
+    2:  course_stars_meta(0x0e, 10, "Ruined Snowscape",               id=198864, badge="221307"),
+    3:  course_stars_meta(0x0d, 10, "Conquered the Badlands",         id=198865, badge="221308"),
+    4:  course_stars_meta(0x0c, 10, "Plumbing Work",                  id=198866, badge="221309"),
+    5:  course_stars_meta(0x13, 10, "Hotty Hot Exploration",          id=198867, badge="221310"),
 }
 
 function course_stars_count(course_num, is_delta) {
@@ -691,7 +691,7 @@ achievement(
     points=10,
     trigger = star_milestone_trigger(50),
     id=198887,
-    badge="220995"
+    badge="221311"
 )
 
 // switches
@@ -747,7 +747,7 @@ achievement(
     points = 3,
     trigger = jail_softlock_trigger(),
     id=198870,
-    badge="220978"
+    badge="221312"
 )
 
 music_switcher = nth_array_object(object_indexes["Lava Wasteland"]["Music Switcher"])
@@ -841,7 +841,7 @@ achievement(
     points = 10,
     trigger = beat_game() && saved_time() < int_seconds_to_frames(30 * 60),
     id=198885,
-    badge="220993"
+    badge="221313"
 )
 
 leaderboard(
