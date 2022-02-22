@@ -394,6 +394,7 @@ level_id__mem = byte(level_id__addr)
 function course_meta(value, sublevel_values, full_name) => {"value": value, "sublevel values": sublevel_values, "full name": full_name}
 
 course_infos = {
+    "Spawn Area":       course_meta(0x06, 1,    "Inside the Jail"), // for "softlock" achievement
     "Overworld 1":      course_meta(0x06, -1,   "Inside the Jail"), // Inside Castle
     "Overworld 2":      course_meta(0x1a, -1,   "Outside the Jail"),
     
@@ -577,7 +578,7 @@ achievement(
         && pause_lock_hacktice_in_level("Lava Wasteland") 
         && (trigger_when(prev(nof_coins()) < 104 && nof_coins() >= 104) || (prev(nof_coins()) < 104 && measured(nof_coins() >= 104, when=in_level("Lava Wasteland")))),
     id=198877,
-    badge="220985"
+    badge="221312"
 )
 
 red_radar = nth_array_object(object_indexes["Rainbow Heavens"]["Red Coin Radar"])
@@ -736,9 +737,11 @@ function jail_softlock_trigger() {
         [-5315.0, -5603.0, 200, 100, 1062.0, 3592.0] // two cells opposite spawn cell
     ]
     
-    return in_level("Overworld 1") && sublevel_id__mem == 1
-        && wearing_vanish_cap() == 0 
-        && any_of(boxes, b => in_3d_box(b[0], b[1], 165.0, 1200.0, b[4], b[5], check_edges=1)) 
+    return never(!in_level("Spawn Area"))
+        && pause_lock_hacktice_in_level("Spawn Area")
+        && once(wearing_vanish_cap() == 1)
+        && trigger_when(wearing_vanish_cap() == 0) 
+        && any_of(boxes, b => trigger_when(in_3d_box(b[0], b[1], 165.0, 1200.0, b[4], b[5], check_edges=1))) 
 }
 
 achievement(
@@ -747,7 +750,7 @@ achievement(
     points = 3,
     trigger = jail_softlock_trigger(),
     id=198870,
-    badge="221312"
+    badge="220978"
 )
 
 music_switcher = nth_array_object(object_indexes["Lava Wasteland"]["Music Switcher"])
