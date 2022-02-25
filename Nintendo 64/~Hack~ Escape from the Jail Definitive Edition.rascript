@@ -495,7 +495,7 @@ for num in course_offsets {
 achievement(
     title="How to Cross the Lava",
     description="In Course 1 (mission 4, 5, or 6), collect the star 'At the End of the Lava Source' without taking damage.",
-    points=4,
+    points=5,
     trigger=remained_in_level("Course 1")
         && pause_lock_hacktice_in_level("Course 1")
         && mission_id__mem >= 4 && mission_id__mem <= 6
@@ -645,7 +645,7 @@ achievement(
 achievement(
     title="The First Jail Guardian",
     description="Defeat the big Mr. I and collect its star.",
-    points=1,
+    points=2,
     trigger=in_level("VS Mr. I") && just_collected_star(),
     id=198881,
     badge="220989"
@@ -737,17 +737,15 @@ function jail_softlock_trigger() {
         [-5315.0, -5603.0, 200, 100, 1062.0, 3592.0] // two cells opposite spawn cell
     ]
     
-    return never(!in_level("Spawn Area"))
-        && pause_lock_hacktice_in_level("Spawn Area")
-        && once(wearing_vanish_cap() == 1)
-        && trigger_when(wearing_vanish_cap() == 0) 
-        && any_of(boxes, b => trigger_when(in_3d_box(b[0], b[1], 165.0, 1200.0, b[4], b[5], check_edges=1))) 
+    return in_level("Overworld 1") && any_of([1, 0], a => sublevel_id__mem == a)
+        && wearing_vanish_cap() == 0
+        && any_of(boxes, b => (in_3d_box(b[0], b[1], 165.0, 1200.0, b[4], b[5], check_edges=1))) 
 }
 
 achievement(
     title = "Stuck Forever?",
-    description = "Lock yourself inside of one of the jail cells in the starting area (see comment).",
-    points = 3,
+    description = "Lock yourself inside of one of the jail cells in the starting area (hacktice allowed, see comment).",
+    points = 1,
     trigger = jail_softlock_trigger(),
     id=198870,
     badge="220978"
