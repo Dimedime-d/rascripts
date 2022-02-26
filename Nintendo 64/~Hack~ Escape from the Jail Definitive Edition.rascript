@@ -34,32 +34,40 @@ offsets = {
     
     "MUSIC ID":     0x09e3c2,
     
-    "GLOBAL TIMER": 0x182080,
-    "GLOBAL TIMER OFFSET": 0x182104,
-    "FILE ID":      0x182108,
-    "MAP ID":       0x18210a,
+    "NUM VBLANKS":  0x0d2010,
+    "GLOBAL TIMER OFFSET": 0x182134,
+    "FILE ID":      0x182138,
+    "MAP ID":       0x18213a,
     
-    "DIALOGUE ID":  0x183906,
-    "STOOD ON OBJECT":  0x185394,
-    "COLLECTED STAR ID":    0x185417,
+    "DIALOGUE ID":  0x183936,
+    "STOOD ON OBJECT":  0x18539C,
+    "COLLECTED STAR ID":    0x1853D3,
     
-    "HACKTICE FLAG":    0x18b0a5,
+    "HACKTICE FLAG":    0x18b659,
 
-    "LEVEL INDEX":  0x18f5a4,
-    "MISSION SELECT":   0x18f5a6,
+    "LEVEL INDEX":      0x18fb64,
+    "MISSION SELECT":   0x18fb66,
     
-    "TIMER RUNNING":    0x1902e3,
-    "TRANSITION TYPE":  0x1902ee,
+    "TIMER RUNNING":    0x1908a3,
+    "TRANSITION TYPE":  0x1908ae,
     
-    "SUBMAP ID":        0x1902f1,
+    "SUBMAP ID":        0x1908b1,
     
-    "HUD FLAGS":   0x190308,   //  https://github.com/n64decomp/sm64/blob/1372ae1bb7cbedc03df366393188f4f05dcfc422/src/game/level_update.h#L91
-    "HUD TIMER":   0x19030e,
+    "HUD FLAGS":   0x1908c8,   //  https://github.com/n64decomp/sm64/blob/1372ae1bb7cbedc03df366393188f4f05dcfc422/src/game/level_update.h#L91
+    "HUD TIMER":   0x1908ce,
     
-    "MARIO STRUCT": 0x190310,
-    "OBJECT ARRAY": 0x190fa4,
+    "MARIO STRUCT": 0x1908d0,
+    "OBJECT ARRAY": 0x191564,
     
-    "SAVE DATA MODIFIED":   0x1b4be3
+    //"SAVE DATA MODIFIED":   0x1b4be3 not gonna bother hunting this down
+}
+
+behaviour_script__values = { // these can also get shuffled around in updates
+    "music switcher":       0x80263048,
+    "red coin radar":       0x80263068,
+    "speedy trials timer":  0x8026321c,
+    "small bully":          0x80265468,
+    "king bobomb":          0x8026884c,
 }
 
 // ---------------
@@ -216,16 +224,6 @@ object__struct = {
 }
 object__sizeof = 0x260
 
-behaviour_script__values = {
-    "music switcher":       0x80263040,
-    "red coin radar":       0x80263068,
-    "speedy trials timer":  0x80263210,
-    "goomba from triplet":  0x8026429c,
-    "naked koopa":          0x8026443c,
-    "small bully":          0x80265468,
-    "king bobomb":          0x8026884c,
-}
-
 function object_graph_invisible(addr) => bit4(object_field(addr, "graph node flags"))
 function object_graph_animation_active(addr) => bit5(object_field(addr, "graph node flags"))
 
@@ -369,7 +367,7 @@ function pressed_switch(color, delta){
     return pressed_switch__mem(color, delta) == 1
 }
 
-global_timer__addr = offsets["GLOBAL TIMER"]
+global_timer__addr = offsets["NUM VBLANKS"]
 global_timer_offset__addr = offsets["GLOBAL TIMER OFFSET"]
 
 function global_timer() => dword(global_timer__addr)
@@ -766,7 +764,7 @@ achievement(
 
 // LB's / speedrun cheevs
 
-function int_seconds_to_frames(sec) => sec * 30
+function int_seconds_to_frames(sec) => sec * 60
 
 speedy_timer = nth_array_object(object_indexes["Speedy Trials"]["Speedy Trials Timer"])
 
@@ -790,9 +788,9 @@ achievement(
     points= 10,
     trigger = pause_lock_hacktice_in_level("Speedy Trials")
         && object_action(speedy_timer) > 0
-        && prev(object_timer(speedy_timer)) <= 0x708
+        && prev(object_timer(speedy_timer)) <= int_seconds_to_frames(60) / 2
         && trigger_when(object_speedy_trials_finished(speedy_timer)
-        && object_speedy_trials_end_time(speedy_timer) >= int_seconds_to_frames(60)),
+        && object_speedy_trials_end_time(speedy_timer) >= int_seconds_to_frames(60) / 2),
     id=198883,
     badge="220991"
 )
@@ -819,7 +817,7 @@ achievement(
     trigger = pause_lock_hacktice_in_level("Slide")
         && hud_timer_shown() == 1
         && hud_timer() > 0
-        && hud_timer() < int_seconds_to_frames(22)
+        && hud_timer() < int_seconds_to_frames(22) / 2
         && trigger_when(hud_timer_stopped_counting()),
     id=198884,
     badge="220992"
@@ -831,7 +829,7 @@ leaderboard(
     start = beat_game(),
     cancel = always_false(),
     submit = always_true(),
-    value = 2*saved_time(),
+    value = saved_time(),
     format = "FRAMES",
     lower_is_better = true
 )
@@ -851,7 +849,7 @@ leaderboard(
     start = beat_game() && nof_stars() >= 50,
     cancel = always_false(),
     submit = always_true(),
-    value = 2*saved_time(),
+    value = saved_time(),
     format = "FRAMES",
     lower_is_better = true
 )
@@ -909,8 +907,8 @@ function rp_cond_display_same_display(cond, lookup) {
         rich_presence_lookup("VanishCap", pressed_switch__mem("blue"), {1:"🔵"}),
         rich_presence_lookup("IceCap", pressed_switch__mem("green"), {1:"⚪"}),
         rich_presence_lookup("WingCap", pressed_switch__mem("red"), {1:"🔴"}),
-        rich_presence_macro("Seconds", global_real_time() / 30))   
-        // RATools is a dumbo and replaces this with * 0.333333333333, so replace that accessor with B:0xX182104/30_I:0xH182108*112_A:0xX027534/30_M:0xX182080/30
+        rich_presence_macro("Seconds", global_real_time() / 60))   
+        // RATools is a dumbo and replaces this with * 0.333333333333, so replace that accessor with B:0xX182134/60_I:0xH182138*112_A:0xX027534/60_M:0xX0d2010/60
 }
 
 cond_displays = {
