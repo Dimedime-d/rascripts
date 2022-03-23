@@ -123,8 +123,8 @@ for mission in ac_missions {
     mission_complete_trigger = never(!game_mode_is("Campaign"))
         && advance_campaign_flag() == 1
         && any_of(valid_maps, m => map_id__mem == m)
-        && once(victory_state__mem == 0)
-        && victory_state__mem == 1
+        && once(victory_state__mem == 4)
+        && victory_state__mem == 5
     
     achievement(
         title = format("{0} (Advance Campaign)", title),
