@@ -968,11 +968,12 @@ function tally_dead_chill_bullies(count) {
     return tally(count, dead_bullies)
 }
 
+// Ticket # 47675 - measured doesn't reset if you move from level to level (change lvl check to an inverted reset)
 achievement(
     title = "They Melt in the Air",
     description = "Course 3 - Melt all 6 chill bullies by getting them low enough (bullies melting themselves count).",
     points = 5,
-    trigger = in_level("Course 3")
+    trigger = never(!in_level("Course 3"))
         && measured(tally_dead_chill_bullies(6)),
     id = 213228,
     badge = "235510"
