@@ -686,11 +686,19 @@ function tally_all_1ups(tallies=[], total_count=0)
             
             coll_check = mario_collision_check(obj_addr, obj_name, i)
             
-            if (obj_name == "chasing 1-up")
-                coll_check = coll_check && object_action(obj_addr) == 1
-
-            array_push(mushie_tally,
-                repeated(t["count"], coll_check))   
+            if (obj_name == "chasing 1-up") {
+                coll_check1 = coll_check && object_action(obj_addr) == 1
+                coll_check2 = coll_check && object_action(obj_addr) == 3
+                    && object_timer(obj_addr) >= 37
+                array_push(mushie_tally,
+                    repeated(t["count"], coll_check1))
+                array_push(mushie_tally,
+                    repeated(t["count"], coll_check2))
+            }
+            else {
+                array_push(mushie_tally,
+                    repeated(t["count"], coll_check))   
+            }
         }
     }
     return tally(total_count, mushie_tally)
