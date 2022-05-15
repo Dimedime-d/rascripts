@@ -314,6 +314,8 @@ function object_boo_death_status(addr) => dword(object_field(addr, "boo death st
 function object_anim(addr) => word(object_field(addr, "animation"))
 function object_action(addr) => dword(object_field(addr, "action"))
 
+function object_timer(addr) => dword(object_field(addr, "timer"))
+
 OBJ_ACTION_LAVA_DEATH = 100
 
 function object_beh_param_2(addr) => dword(object_field(addr, "behavior param 2"))
@@ -779,11 +781,20 @@ function tally_all_1ups(tallies=[], total_count=0)
             
             coll_check = mario_collision_check(obj_addr, obj_name, i)
             
-            if (obj_name == "chasing 1-up")
-                coll_check = coll_check && object_action(obj_addr) == 1
-
-            array_push(mushie_tally,
-                repeated(t["count"], coll_check))   
+            if (obj_name == "chasing 1-up") {
+            // https://github.com/n64decomp/sm64/blob/master/src/game/behaviors/mushroom_1up.inc.c
+                coll_check1 = coll_check && object_action(obj_addr) == 1
+                coll_check2 = coll_check && object_action(obj_addr) == 3
+                    && object_timer(obj_addr) >= 37
+                array_push(mushie_tally,
+                    repeated(t["count"], coll_check1))
+                array_push(mushie_tally,
+                    repeated(t["count"], coll_check2))
+            }
+            else {
+                array_push(mushie_tally,
+                    repeated(t["count"], coll_check))   
+            }
         }
     }
     return tally(total_count, mushie_tally)
@@ -1109,7 +1120,7 @@ achievement(
     trigger = remained_in_level("Course 11")
         &&  collided_with_object("1-up in pole activator", count=2, extra_logic = g_red_coins_collected__mem == 0)
             // pole 1-up spawners create 2 activators
-        &&  never(collided_with_object("chasing 1-up", check_action=1))
+        &&  never(tally_all_1ups([{"type": "chasing", "count": 1}], total_count=1))
             // action 1 = done looping and visible, is collectible
         &&  trigger_when(collecting_star_object("spawned star", mission=1-1)),
     id = 213236,
