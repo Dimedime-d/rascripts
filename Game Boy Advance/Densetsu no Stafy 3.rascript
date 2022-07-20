@@ -193,7 +193,7 @@ function minigame_type_is(name) => minigame_type__mem() == minigame__values[name
 for name in minigame__values {
     info = minigame__values[name]
     cheev_title = info["title"]
-    cheev_desc = format("Complete {0} on hard difficulty.", info["desc"])
+    cheev_desc = format("Win at {0} on hard difficulty.", info["desc"])
     cheev_points = info["points"]
     
     state = info["state"]
@@ -276,7 +276,7 @@ for i in range(1, 9) {
     stage = stages[i]
     achievement(
         title=stage["title"],
-        description=format("Complete {0} during the main story.", stage["stage"]),
+        description=format("Clear Stage {1}, {0}, during the main story.", stage["stage"], i),
         trigger = game_state_is("Clear")
             && just_increased(area_complete_flag(i, 4)),
         points=stage["points"]
