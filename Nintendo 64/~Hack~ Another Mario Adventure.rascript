@@ -212,6 +212,7 @@ mario_action__values = {
     "warp door spawn":             0x00001322,
     "spawn spin landing":          0x00001325,
     "start teleporting":           0x00001336,
+    "in cannon":                   0x00001371,
     "star grab fall":              0x00001904,
     "airborne spawn":              0x00001924,
     
@@ -520,7 +521,7 @@ file_num__mem = byte(file_num__addr)
 save_data_base__addr = offsets["SAVE DATA"]
 current_file__addr = save_data_base__addr + 0x70 * file_num__mem
 
-function pressed_switch__mem(color, delta="f"){
+function pressed_switch__mem(color, delta=-1){
     switch_mem = always_false
     if color == "red"
         switch_mem = bit1(current_file__addr + 8)
@@ -529,13 +530,13 @@ function pressed_switch__mem(color, delta="f"){
     else if color == "blue"
         switch_mem = bit3(current_file__addr + 8)
      
-    if delta == "true"
+    if (delta > 0)
         return prev(switch_mem)
     else
         return switch_mem
 }
 
-function pressed_switch(color, delta){
+function pressed_switch(color, delta=-1){
     return pressed_switch__mem(color, delta) == 1
 }
 
@@ -575,8 +576,8 @@ g_red_coins_collected__mem = byte(g_red_coins_collected__addr)
 
 function course_meta(value, sublevel_values, full_name) => {"value": value, "sublevel values": sublevel_values, "full name": full_name}
 
+// https://github.com/n64decomp/sm64/blob/master/levels/level_defines.h level id's
 course_infos = {
-    
     "Overworld 1":      course_meta(0x10, [-1],   "the first overworld"), // Castle Grounds, not gonna distinguish day/night
     "Overworld 2 Fire": course_meta(0x06, [1], "the second overworld (fire side)"), // Inside Castle
     "Overworld 2 Ice":  course_meta(0x06, [2], "the second overworld (ice side)"), // Inside Castle
@@ -675,6 +676,18 @@ milestones = [
     //milestone_meta("Finished the Summer Collab",
     //    "Collect all 28 stars.",
     //    stars=28, points=10)
+    milestone_meta("Another Journey Has Started",
+        "Collect your first star.",
+        stars=1, points=1),
+    milestone_meta("Opened a Star Door Somewhere",
+        "Collect 8 stars.",
+        stars=8, points=3),
+    milestone_meta("To the Final Overworld",
+        "Collect 50 stars.",
+        stars=50, points=10),
+    milestone_meta("End of This Community Collab",
+        "Collect all 120 stars.",
+        stars=120, points=25),
 ]
 
 for milestone in milestones {
@@ -688,9 +701,93 @@ for milestone in milestones {
     )
 }
 
+// switches
+function rg_trigger() {
+    return level_id__mem == prev(level_id__mem) // to prevent switching files after the ending picture puts you back to the title screen...
+    
+    && tally(1, 
+    [once(pressed_switch("red", delta=1)),
+    once(pressed_switch("green", delta=1)),
+    //once(pressed_switch("blue", "true"))
+    ])
+    
+    && measured(tally(2, 
+    [once(pressed_switch("red")),
+    once(pressed_switch("green")),
+    //once(pressed_switch("blue", "f"))
+    ]), when=!in_title_or_file_select())
+    
+    && never(tally(2, 
+    [once(pressed_switch("red", delta=1)),
+    once(pressed_switch("green", delta=1)),
+    //once(pressed_switch("blue", delta=1))
+    ]))
+}
+
+achievement(
+    title = "Vanish Cap Sucks Anyway",
+    description = "Press the red and green !-switches.",
+    points = 5,
+    trigger = rg_trigger()
+)
+
+//-------------
+// course stars
+//-------------
+
+function course_stars_meta(star_bits, points, title, description_add="", id=0, badge="0") => {"star bits": star_bits, "points": points, "title": title, "description add": description_add, "id": id, "badge": badge}
+
+function sum_star_bits(file_offset, bits) {
+    off = current_file__addr + file_offset
+    return {
+        "mem": sum_of(bits, b => bit(b, off)),
+        "sum": length(bits)
+    }
+}
+
+// https://github.com/n64decomp/sm64/blob/master/levels/course_defines.h indexes (add 0x0c) (remember endian weirdness)
+course_offsets = {
+    "Course 1":  course_stars_meta(sum_star_bits(0x0f, range(0, 6)), 5, "Tree of Life"),
+    "Course 2":  course_stars_meta(sum_star_bits(0x0e, range(0, 6)), 5, "Go the Jungle Adventure"),
+    "Course 3":  course_stars_meta(sum_star_bits(0x0d, range(0, 6)), 5, "Skyline Before Twilight"           ),
+    "Course 4":  course_stars_meta(sum_star_bits(0x0c, range(0, 6)), 5, "Beach Party"       ),
+    "Course 5":  course_stars_meta(sum_star_bits(0x13, range(0, 6)), 10, "Oasis in the Desert"         ),
+    "Course 6":  course_stars_meta(sum_star_bits(0x12, range(0, 6)), 10, "First Freezeflame Trials"        ),
+    "Course 7":  course_stars_meta(sum_star_bits(0x11, range(0, 6)), 10, "Luminescent Valley"          ),
+    "Course 8":  course_stars_meta(sum_star_bits(0x10, range(0, 6)), 10, "Mario's Trip in China, but Easier"        ),
+    "Course 9":  course_stars_meta(sum_star_bits(0x17, range(0, 6)), 10, "Magic House"          ),
+    
+    "Guest Course 1":  course_stars_meta(sum_star_bits(0x15, range(0, 6)), 10, "Tomatobird's Classic Pack"),
+    "Guest Course 2":  course_stars_meta(sum_star_bits(0x14, range(0, 6)), 10, "Brodute's Mountain Range"),
+    "Guest Course 3":  course_stars_meta(sum_star_bits(0x1b, range(0, 6)), 10, "usernamesarespiders' Detailed Castle"),
+    "Guest Course 4":  course_stars_meta(sum_star_bits(0x1a, range(0, 6)), 10, "scuttlebugraiser's Fire Trials"),
+    "Guest Course 5":  course_stars_meta(sum_star_bits(0x19, range(0, 6)), 10, "Pie's Red Papercraft"),
+}
+
+for c in course_offsets {
+    info = course_offsets[c]
+    bits = info["star bits"]["mem"]
+    star_count = info["star bits"]["sum"]
+    
+    title = info["title"]
+    description = format("Collect all {0} stars in {1}{2}.",
+        star_count,
+        course_infos[c]["full name"],
+        info["description add"])
+    
+    achievement(
+        title=title,
+        description=description,
+        points=info["points"],
+        trigger= in_level(c)
+            && prev(bits) == star_count - 1
+            && measured(bits == star_count, when=!in_title_or_file_select()),
+        id = info["id"],
+        badge = info["badge"]
+    )
+}
 
 // 1-ups
-
 // Re-wire logic for single 1-ups
 function collected_1up(type="stationary", text=0) {
     mushie_tally = []
@@ -769,6 +866,18 @@ for dat in mushie_infos {
 
 // Challenges
 
+achievement(
+    title = "Another Adventure, Another Pointless Switch",
+    description = "Course 1 - Collect the star 'Wooded Secrets Platforming' without pressing the purple switch.",
+    points = 2,
+    trigger = once(entered_level_from_star_select("Course 1"))
+        && sublevel_id__mem == 1
+        && never(level_changed())
+        && never(object_is(stood_on_object(), "purple box switch")
+            && object_action(stood_on_object()) == 1)
+        && trigger_when(collecting_star_object("spawned star", 1))
+)
+
 function blue_coin_switch_done(obj) {
     return unless(!object_is(obj, "blue coin switch"))
         && once(just_changed(object_action(obj), 1, 2))
@@ -787,12 +896,45 @@ achievement(
 )
 
 achievement(
+    title = "Funny Little Red Blocks",
+    description = "Course 3 - Collect the star 'Top of the Spinning Tower' without getting a wing cap.",
+    points = 5,
+    trigger = once(entered_level_from_star_select("Course 3"))
+        && sublevel_id__mem == 1
+        && never(level_changed())
+        && never(just_increased(wearing_wing_cap()))
+        && collecting_star_object("regular star", 5)
+)
+
+achievement(
     title = "Good Old Tower Climbing",
     description = "Enter the other Course 4 entrance in the overworld without getting a wing cap (enter level or switch day/night to reset).",
     points = 5,
     trigger = in_level("Overworld 1")
         && disable_when(just_increased(wearing_wing_cap()), until=screen_changed())
         && using_teleporter(0x22)
+)
+
+achievement(
+    title = "Another Cannonless Mission",
+    description = "Course 5 - Collect the star 'Get on Yellow Desert Temple Top' without using the cannon.",
+    points = 5,
+    trigger = once(entered_level_from_star_select("Course 5"))
+        && sublevel_id__mem == 1
+        && never(level_changed())
+        && never(mario_action_changed_to("in cannon"))
+        && trigger_when(collecting_star_object("regular star", 2))
+)
+
+achievement(
+    title = "Keep Your Cool",
+    description = "Course 6 - Collect the star 'Penguin Trapped in Burnt Room' without going below 6 HP.",
+    points = 5,
+    trigger = once(entered_level_from_star_select("Course 6"))
+        && sublevel_id__mem == 1
+        && never(level_changed())
+        && never(hp() < 0x600 && hp() >= 0x200)
+        && trigger_when(collecting_star_object("spawned star", 0))
 )
 
 // C7 timer
@@ -1079,7 +1221,7 @@ achievement(
     title = "Coin Collecting with Certain Death",
     description = "Course 8 - Collect all 8 coins from the arrow over quicksand.",
     points = 5,
-    trigger = in_area("Course 8", 1) && never(just_changed_any(level_id__mem)) && any_of(array_map(range(0, 239), a => c8_coin_arrow_cond(nth_array_object(a))), b => b)
+    trigger = in_area("Course 8", 1) && never(level_changed()) && any_of(array_map(range(0, 239), a => c8_coin_arrow_cond(nth_array_object(a))), b => b)
 )
 
 function c9_puzzle_activated_cond(obj) {
