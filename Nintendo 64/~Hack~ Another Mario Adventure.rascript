@@ -67,6 +67,8 @@ behaviour_script__values = {
     "coin formation":   0x800EBA6C,
     
     "purple box switch":0x800EC62C,
+    "grand star":       0x800EC894,
+    "bowser 3":         0x800EC9D0,
     "blue coin switch": 0x800ED6E8,
     
     "regular star":     0x800EEFBC,
@@ -658,6 +660,9 @@ function entered_level_from_star_select(name) => in_level(name) && just_changed_
 
 function level_changed() => just_changed_any(level_id__mem)
 
+// for challenges that, if failed, require re-entering the level
+function remained_in_level(name) => once(entered_level_from_star_select(name)) && never(level_changed())
+
 //
 //  Cheevs
 //
@@ -665,9 +670,9 @@ function level_changed() => just_changed_any(level_id__mem)
 // Milestones
 
 function star_milestone_trigger(num_stars) {
-    return measured(nof_stars() == num_stars, when=!in_title_or_file_select())
-        && prev(nof_stars()) == num_stars - 1
-        && level_id__mem == prev(level_id__mem) // to prevent switching files to pop the achievement
+    return level_id__mem == prev(level_id__mem) // to prevent switching files to pop the achievement
+        && prev(nof_stars()) == num_stars - 1 
+        && measured(nof_stars() == num_stars, when=!in_title_or_file_select())
 }
 
 function milestone_meta(title, description, stars, points, id=0, badge="0") => {"title": title, "description": description, "stars": stars, "points": points, "id": id, "badge": badge}
@@ -678,16 +683,16 @@ milestones = [
     //    stars=28, points=10)
     milestone_meta("Another Journey Has Started",
         "Collect your first star.",
-        stars=1, points=1),
+        stars=1, points=1, id=237218, badge="263301"),
     milestone_meta("Opened a Star Door Somewhere",
         "Collect 8 stars.",
-        stars=8, points=3),
+        stars=8, points=5, id=237219, badge="263302"),
     milestone_meta("To the Final Overworld",
         "Collect 50 stars.",
-        stars=50, points=10),
+        stars=50, points=10, id=237220, badge="263303"),
     milestone_meta("End of This Community Collab",
         "Collect all 120 stars.",
-        stars=120, points=25),
+        stars=120, points=25, id=237221, badge="263304"),
 ]
 
 for milestone in milestones {
@@ -704,6 +709,7 @@ for milestone in milestones {
 // switches
 function rg_trigger() {
     return level_id__mem == prev(level_id__mem) // to prevent switching files after the ending picture puts you back to the title screen...
+    && file_num__mem == prev(file_num__mem)
     
     && tally(1, 
     [once(pressed_switch("red", delta=1)),
@@ -724,11 +730,33 @@ function rg_trigger() {
     ]))
 }
 
+// caps / bowsers
+
 achievement(
     title = "Vanish Cap Sucks Anyway",
     description = "Press the red and green !-switches.",
     points = 5,
-    trigger = rg_trigger()
+    trigger = rg_trigger(),
+    id = 237222,
+    badge = "263305"
+)
+
+achievement(
+    title = "Icy Retreat",
+    description = "Defeat Bowser in the Ice Mines and collect his key.",
+    points = 5,
+    trigger = in_level("Key 1") && just_collected_star(),
+    id = 237223,
+    badge = "263306"
+)
+
+achievement(
+    title = "Another Bowser Bites the Dust",
+    description = "Defeat Bowser in the Crimson Carnival and collect the grand star.",
+    points = 10,
+    trigger = in_level("Final Fight") && interaction_object() != 0 && object_is(interaction_object(), "grand star"),
+    id = 237224,
+    badge = "263307"
 )
 
 //-------------
@@ -747,21 +775,21 @@ function sum_star_bits(file_offset, bits) {
 
 // https://github.com/n64decomp/sm64/blob/master/levels/course_defines.h indexes (add 0x0c) (remember endian weirdness)
 course_offsets = {
-    "Course 1":  course_stars_meta(sum_star_bits(0x0f, range(0, 6)), 5, "Tree of Life"),
-    "Course 2":  course_stars_meta(sum_star_bits(0x0e, range(0, 6)), 5, "Go the Jungle Adventure"),
-    "Course 3":  course_stars_meta(sum_star_bits(0x0d, range(0, 6)), 5, "Skyline Before Twilight"           ),
-    "Course 4":  course_stars_meta(sum_star_bits(0x0c, range(0, 6)), 5, "Beach Party"       ),
-    "Course 5":  course_stars_meta(sum_star_bits(0x13, range(0, 6)), 10, "Oasis in the Desert"         ),
-    "Course 6":  course_stars_meta(sum_star_bits(0x12, range(0, 6)), 10, "First Freezeflame Trials"        ),
-    "Course 7":  course_stars_meta(sum_star_bits(0x11, range(0, 6)), 10, "Luminescent Valley"          ),
-    "Course 8":  course_stars_meta(sum_star_bits(0x10, range(0, 6)), 10, "Mario's Trip in China, but Easier"        ),
-    "Course 9":  course_stars_meta(sum_star_bits(0x17, range(0, 6)), 10, "Magic House"          ),
+    "Course 1":  course_stars_meta(sum_star_bits(0x0f, range(0, 6)), 10, "Tree of Life", id=237225, badge="263308"),
+    "Course 2":  course_stars_meta(sum_star_bits(0x0e, range(0, 6)), 10, "Go the Jungle Adventure", id=237226, badge="263309"),
+    "Course 3":  course_stars_meta(sum_star_bits(0x0d, range(0, 6)), 10, "Skyline Before Twilight", id=237227, badge="10"),
+    "Course 4":  course_stars_meta(sum_star_bits(0x0c, range(0, 6)), 10, "Beach Party", id=237228, badge="263311"),
+    "Course 5":  course_stars_meta(sum_star_bits(0x13, range(0, 6)), 10, "Oasis in the Desert", id=237229, badge="263312"),
+    "Course 6":  course_stars_meta(sum_star_bits(0x12, range(0, 6)), 10, "First Freezeflame Trials", id=237230, badge="263313"),
+    "Course 7":  course_stars_meta(sum_star_bits(0x11, range(0, 6)), 10, "Luminescent Valley", id=237231, badge="263314"),
+    "Course 8":  course_stars_meta(sum_star_bits(0x10, range(0, 6)), 10, "Mario's Trip in China, but Easier", id=237232, badge="263315"),
+    "Course 9":  course_stars_meta(sum_star_bits(0x17, range(0, 6)), 10, "Magic House", id=237233, badge="263316"),
     
-    "Guest Course 1":  course_stars_meta(sum_star_bits(0x15, range(0, 6)), 10, "Tomatobird's Classic Pack"),
-    "Guest Course 2":  course_stars_meta(sum_star_bits(0x14, range(0, 6)), 10, "Brodute's Mountain Range"),
-    "Guest Course 3":  course_stars_meta(sum_star_bits(0x1b, range(0, 6)), 10, "usernamesarespiders' Detailed Castle"),
-    "Guest Course 4":  course_stars_meta(sum_star_bits(0x1a, range(0, 6)), 10, "scuttlebugraiser's Fire Trials"),
-    "Guest Course 5":  course_stars_meta(sum_star_bits(0x19, range(0, 6)), 10, "Pie's Red Papercraft"),
+    "Guest Course 1":  course_stars_meta(sum_star_bits(0x15, range(0, 6)), 10, "Tomatobird's Classic Pack", id=237234, badge="263317"),
+    "Guest Course 2":  course_stars_meta(sum_star_bits(0x14, range(0, 6)), 10, "Brodute's Mountain Range", id=237235, badge="263318"),
+    "Guest Course 3":  course_stars_meta(sum_star_bits(0x1b, range(0, 6)), 10, "usernamesarespiders' Detailed Castle", id=237236, badge="263319"),
+    "Guest Course 4":  course_stars_meta(sum_star_bits(0x1a, range(0, 6)), 10, "scuttlebugraiser's Fire Trials", id=237237, badge="263320"),
+    "Guest Course 5":  course_stars_meta(sum_star_bits(0x19, range(0, 6)), 10, "Pie's Seasonal Papercraft", id=237238, badge="263321"),
 }
 
 for c in course_offsets {
@@ -786,6 +814,77 @@ for c in course_offsets {
         badge = info["badge"]
     )
 }
+
+// expects a star_bits-like object with a mem attribute
+function add_star_bits(star_bits) {
+    return sum_of(star_bits, s => s["mem"])
+}
+
+overworld_stars = [
+    sum_star_bits(0x0b, range(0, 3))
+]
+
+side_courses_stars = [
+    sum_star_bits(0x18, [0]), // B1
+    sum_star_bits(0x1c, [0]), // MC
+    sum_star_bits(0x1e, [0]), // B3
+    sum_star_bits(0x23, [0]), // WC
+]
+
+halls_of_fame_stars = [
+    sum_star_bits(0x1d, [0, 1]), // toasterketchup (Slide)
+    sum_star_bits(0x1f, [0, 1]), // cheezepin (B2)
+    sum_star_bits(0x20, range(0, 5)), // crash, kaze, dimps (aquarium)
+    sum_star_bits(0x21, range(0, 3)) // mrcomit and SEGA (cloud stage) 
+]
+
+achievement(
+    title = "Aglab's Scenic Overworlds",
+    description = "Collect all 4 stars across all 3 overworlds.",
+    points = 4,
+    trigger = level_id__mem == prev(level_id__mem)
+        && file_num__mem == prev(file_num__mem)
+        && prev(add_star_bits(overworld_stars)) == 3
+        && measured(add_star_bits(overworld_stars) == 4, when = !in_title_or_file_select()),
+    id=237239,
+    badge="263322"
+)
+
+achievement(
+    title = "Small but Significant Sides",
+    description = "Collect all 4 stars across Wing Cap, Metal Cap, and both Bowser courses",
+    points = 4,
+    trigger = level_id__mem == prev(level_id__mem)
+        && file_num__mem == prev(file_num__mem)
+        && prev(add_star_bits(side_courses_stars)) == 3
+        && measured(add_star_bits(side_courses_stars) == 4, when = !in_title_or_file_select()),
+    id=237240,
+    badge="263323"
+)
+
+achievement(
+    title = "Halls of Fame Silver",
+    description = "Collect 7 stars across the Halls of Fame.",
+    points = 5,
+    trigger = level_id__mem == prev(level_id__mem) // not gonna bother checking each level
+        && file_num__mem == prev(file_num__mem)
+        && prev(add_star_bits(halls_of_fame_stars)) == 6
+        && measured(add_star_bits(halls_of_fame_stars) == 7, when = !in_title_or_file_select()),
+    id=237241,
+    badge="263324"
+)
+
+achievement(
+    title = "Halls of Fame Gold",
+    description = "Collect all 14 stars across the Halls of Fame.",
+    points = 10,
+    trigger = level_id__mem == prev(level_id__mem) // not gonna bother checking each level
+        && file_num__mem == prev(file_num__mem)
+        && prev(add_star_bits(halls_of_fame_stars)) == 13
+        && measured(add_star_bits(halls_of_fame_stars) == 14, when = !in_title_or_file_select()),
+    id=237242,
+    badge="263325"
+)
 
 // 1-ups
 // Re-wire logic for single 1-ups
@@ -821,37 +920,37 @@ function collected_1up(type="stationary", text=0) {
 function mushie_meta(title="", description="", points=1, type="stationary", text=0, level_check=always_true(), id=0, badge="0") => {"title": title, "description": description, "points": points, "collect check": collected_1up(type, text), "level check": level_check, "id": id, "badge": badge}
 
 mushie_infos = [
-    mushie_meta("Familiar Structure", "Course 1 - Collect a 1-up mushroom on top of some scaffolding.", 1, "stationary", 2, in_area("Course 1", 1)),
-    mushie_meta("Sure is a Secret, Alright", "Course 1 - Collect a 1-up mushroom near a big tree.", 1, "stationary", 1, in_area("Course 1", 1)),
-    mushie_meta("Not a Satisfying Sound", "Course 3 - Collect a 1-up mushroom outside, beside the broken tower.", 1, "stationary", 3, in_area("Course 3")),
-    mushie_meta("Like a Record, Baby", "Course 3 - Collect a 1-up mushroom at the very top of the rotating mill.", 1, "stationary", 24, in_area("Course 3")),
-    mushie_meta("Good Collision, for Sure", "Course 5 - Collect a 1-up mushroom on top of a waterfall.", 1, "stationary", 5, in_area("Course 5", 1)),
-    mushie_meta("Maybe, Maybe", "Course 7 - Collect a 1-up mushroom inside the dark wood room.", 1, "stationary", 6, in_area("Course 7", 3)),
-    mushie_meta("A Wet Life", "Course 8 - Collect a 1-up mushroom inside a waterfall.", 1, "stationary", 7, in_area("Course 8", 1)),
-    mushie_meta("Ridiculous Collectible", "Course 9 - Collect a 1-up mushroom high up, between some inverted platforms", 1, "stationary", 8, in_area("Course 9", 1)),
+    mushie_meta("Familiar Structure", "Course 1 - Collect a 1-up mushroom on top of some scaffolding.", 1, "stationary", 2, in_area("Course 1", 1), id=237243, badge="263326"),
+    mushie_meta("Sure is a Secret, Alright", "Course 1 - Collect a 1-up mushroom near a big tree.", 1, "stationary", 1, in_area("Course 1", 1), id=237244, badge="263327"),
+    mushie_meta("Not a Satisfying Sound", "Course 3 - Collect a 1-up mushroom outside, beside the broken tower.", 1, "stationary", 3, in_area("Course 3"), id=237245, badge="263328"),
+    mushie_meta("Like a Record, Baby", "Course 3 - Collect a 1-up mushroom at the very top of the rotating mill.", 1, "stationary", 24, in_area("Course 3"), id=237246, badge="263329"),
+    mushie_meta("Good Collision, for Sure", "Course 5 - Collect a 1-up mushroom at the top of a waterfall.", 1, "stationary", 5, in_area("Course 5", 1), id=237247, badge="263330"),
+    mushie_meta("Maybe, Maybe", "Course 7 - Collect a 1-up mushroom inside the dark wood room.", 1, "stationary", 6, in_area("Course 7", 3), id=237248, badge="263331"),
+    mushie_meta("A Wet Life", "Course 8 - Collect a 1-up mushroom inside a waterfall.", 1, "stationary", 7, in_area("Course 8", 1), id=237249, badge="263332"),
+    mushie_meta("Ridiculous Collectible", "Course 9 - Collect a 1-up mushroom high up, between some inverted platforms.", 1, "stationary", 8, in_area("Course 9", 1), id=237250, badge="263333"),
     
     
-    mushie_meta("It's Okay, I Guess", "Guest Course 1 - Collect a 1-up mushroom inside a small pentagon pillar.", 1, "chasing", 0x200, in_area("Guest Course 1", 2)),
-    mushie_meta("Reference to Someone", "Guest Course 2 - Collect a 1-up mushroom above a waterfall.", 1, "stationary", 10, in_area("Guest Course 2", 1)),
-    mushie_meta("The Real Secret", "Guest Course 3 - Collect a 1-up mushroom between some bookshelves.", 1, "stationary", 11, in_area("Guest Course 3", 1)),
-    mushie_meta("It's Clean, Right?", "Guest Course 3 - Collect a 1-up mushroom inside one of the castle rooms.", 1, "stationary", 12, in_area("Guest Course 3", 1)),
-    mushie_meta("Pole Climbing, That's How", "Guest Course 3 - Collect a 1-up mushroom high up in the ice cavern.", 1, "stationary", 4, in_area("Guest Course 3", 2)),
-    mushie_meta("No BLJ's Required, Really", "Guest Course 4 - Collect a 1-up mushroom somewhere inside Zeus's domain.", 1, "stationary", 13, in_area("Guest Course 4", 4)),
-    mushie_meta("The Broken Floor", "Guest Course 5 - Collect a 1-up mushroom under a small staircase.", 1, "stationary", 23, in_area("Guest Course 5", 1)),
+    mushie_meta("It's Okay, I Guess", "Guest Course 1 - Collect a 1-up mushroom inside a small pentagon pillar.", 1, "chasing", 0x200, in_area("Guest Course 1", 2), id=237251, badge="263334"),
+    mushie_meta("Reference to Someone", "Guest Course 2 - Collect a 1-up mushroom above a waterfall.", 1, "stationary", 10, in_area("Guest Course 2", 1), id=237252, badge="263335"),
+    mushie_meta("The Real Secret", "Guest Course 3 - Collect a 1-up mushroom between some bookshelves.", 1, "stationary", 11, in_area("Guest Course 3", 1), id=237253, badge="263336"),
+    mushie_meta("It's Clean, Right?", "Guest Course 3 - Collect a 1-up mushroom inside one of the castle rooms.", 1, "stationary", 12, in_area("Guest Course 3", 1), id=237254, badge="263337"),
+    mushie_meta("Pole Climbing, That's How", "Guest Course 3 - Collect a 1-up mushroom high up in the ice cavern.", 1, "stationary", 4, in_area("Guest Course 3", 2), id=237255, badge="263338"),
+    mushie_meta("No BLJ's Required, Really", "Guest Course 4 - Collect a 1-up mushroom somewhere inside Zeus's domain.", 1, "stationary", 13, in_area("Guest Course 4", 4), id=237256, badge="263339"),
+    mushie_meta("The Broken Floor", "Guest Course 5 - Collect a 1-up mushroom under a small staircase.", 1, "stationary", 23, in_area("Guest Course 5", 1), id=237257, badge="263340"),
     
-    mushie_meta("Got Health?", "Metal Cap Stage - Collect a 1-up mushroom on top of a lavafall.", 1, "stationary", 18, in_area("Metal Cap")),
+    mushie_meta("Got Health?", "Metal Cap Stage - Collect a 1-up mushroom on top of a lavafall.", 1, "stationary", 18, in_area("Metal Cap"), id=237258, badge="263341"),
     
-    mushie_meta("Safety Warp for the Crossovers", "Bowser in the Ice Mines - Collect a 1-up mushroom at the bottom of a slide.", 1, "stationary", 26, in_area("Bowser 1")),
-    mushie_meta("Some Nerfed Slopes", "Bowser in the Crimson Carnival - Collect a 1-up mushroom around a tall building.", 1, "stationary", 17, in_area("Bowser 3")),
-    mushie_meta("Not the Only Sonic Reference", "Bowser in the Crimson Carnival - Collect a 1-up mushroom on top of the buildings in the center.", 1, "stationary", 25, in_area("Bowser 3")),
+    mushie_meta("Safety Warp for the Crossovers", "Bowser in the Ice Mines - Collect a 1-up mushroom at the bottom of a slide.", 1, "stationary", 26, in_area("Bowser 1"), id=237259, badge="263342"),
+    mushie_meta("Some Nerfed Slopes", "Bowser in the Crimson Carnival - Collect a 1-up mushroom around a tall building.", 1, "stationary", 17, in_area("Bowser 3"), id=237260, badge="263343"),
+    mushie_meta("Not the Only Sonic Reference", "Bowser in the Crimson Carnival - Collect a 1-up mushroom on top of the buildings in the center.", 1, "stationary", 25, in_area("Bowser 3"), id=237261, badge="263344"),
     
-    mushie_meta("The Hack Creator Likes Sonic, Alright", "The Halls of Fame - Collect a 1-up mushroom above the arches of the hall.", 1, "stationary", 19, in_area("Halls of Fame")),
-    mushie_meta("This Doorway Doesn't Work", "SEGA's level - Collect a 1-up mushroom near the starting point.", 1, "stationary", 22, in_area("SEGA")),
-    mushie_meta("Creator's Design Choice, That's Why", "Cheezepin's level - Collect a 1-up mushroom on top of a tree.", 1, "stationary", 16, in_area("Cheezepin")),
-    mushie_meta("The Way Physics Work", "Kaze's level - Collect a 1-up mushroom under the starting point", 1, "stationary", 21, in_area("Kaze")),
+    mushie_meta("The Hack Creator Likes Sonic, Alright", "The Halls of Fame - Collect a 1-up mushroom above the arches of the hall.", 1, "stationary", 19, in_area("Halls of Fame"), id=237262, badge="263345"),
+    mushie_meta("This Doorway Doesn't Work", "SEGA's level - Collect a 1-up mushroom near the starting point.", 1, "stationary", 22, in_area("SEGA"), id=237263, badge="263346"),
+    mushie_meta("Creator's Design Choice, That's Why", "Cheezepin's level - Collect a 1-up mushroom on top of a tree.", 1, "stationary", 16, in_area("Cheezepin"), id=237264, badge="263347"),
+    mushie_meta("The Way Physics Work", "Kaze's level - Collect a 1-up mushroom under the starting point.", 1, "stationary", 21, in_area("Kaze"), id=237265, badge="263348"),
     
-    mushie_meta("Strain-Free Tunnel", "Overworld 1 - Collect a 1-up mushroom in an underwater alcove", 1, "stationary", 14, in_area("Overworld 1")),
-    mushie_meta("It's Pretty Cool, Right?", "Overworld 2 Ice - Collect a 1-up mushroom behind the temple of Prometheus", 1, "stationary", 15, in_area("Overworld 2 Ice")),
+    mushie_meta("Strain-Free Tunnel", "Overworld 1 - Collect a 1-up mushroom in an underwater alcove.", 1, "stationary", 14, in_area("Overworld 1"), id=237266, badge="263349"),
+    mushie_meta("It's Pretty Cool, Right?", "Overworld 2 Ice - Collect a 1-up mushroom off in the distance, behind the temple of Prometheus.", 1, "stationary", 15, in_area("Overworld 2 Ice"), id=237267, badge="263350"),
 ]
 
 for dat in mushie_infos {
@@ -870,12 +969,13 @@ achievement(
     title = "Another Adventure, Another Pointless Switch",
     description = "Course 1 - Collect the star 'Wooded Secrets Platforming' without pressing the purple switch.",
     points = 2,
-    trigger = once(entered_level_from_star_select("Course 1"))
+    trigger = remained_in_level("Course 1")
         && sublevel_id__mem == 1
-        && never(level_changed())
         && never(object_is(stood_on_object(), "purple box switch")
             && object_action(stood_on_object()) == 1)
-        && trigger_when(collecting_star_object("spawned star", 1))
+        && trigger_when(collecting_star_object("spawned star", 1)),
+    id=237268,
+    badge="263351"
 )
 
 function blue_coin_switch_done(obj) {
@@ -892,49 +992,55 @@ achievement(
     trigger = in_area("Course 2", 1)
         && never(screen_changed())
         && never(controller_a_button() != 0)
-        && any_of(array_map(range(0, 239), a => blue_coin_switch_done(nth_array_object(a))), b => b)
+        && any_of(array_map(range(0, 239), a => blue_coin_switch_done(nth_array_object(a))), b => b),
+    id=237269,
+    badge="263352"
 )
 
 achievement(
-    title = "Funny Little Red Blocks",
+    title = "No Wings in This Sky",
     description = "Course 3 - Collect the star 'Top of the Spinning Tower' without getting a wing cap.",
     points = 5,
-    trigger = once(entered_level_from_star_select("Course 3"))
+    trigger = remained_in_level("Course 3")
         && sublevel_id__mem == 1
-        && never(level_changed())
         && never(just_increased(wearing_wing_cap()))
-        && collecting_star_object("regular star", 5)
+        && collecting_star_object("regular star", 5),
+    id=237270,
+    badge="263353"
 )
 
 achievement(
     title = "Good Old Tower Climbing",
-    description = "Enter the other Course 4 entrance in the overworld without getting a wing cap (enter level or switch day/night to reset).",
+    description = "Enter the other Course 4 entrance in the overworld without getting a wing cap (enter any level or switch day/night to reset).",
     points = 5,
     trigger = in_level("Overworld 1")
         && disable_when(just_increased(wearing_wing_cap()), until=screen_changed())
-        && using_teleporter(0x22)
+        && using_teleporter(0x22),
+    id=237271,
+    badge="263354"
 )
 
 achievement(
     title = "Another Cannonless Mission",
     description = "Course 5 - Collect the star 'Get on Yellow Desert Temple Top' without using the cannon.",
     points = 5,
-    trigger = once(entered_level_from_star_select("Course 5"))
+    trigger = remained_in_level("Course 5")
         && sublevel_id__mem == 1
-        && never(level_changed())
         && never(mario_action_changed_to("in cannon"))
-        && trigger_when(collecting_star_object("regular star", 2))
+        && trigger_when(collecting_star_object("regular star", 2)),
+    id=237272,
+    badge="263355"
 )
 
 achievement(
     title = "Keep Your Cool",
     description = "Course 6 - Collect the star 'Penguin Trapped in Burnt Room' without going below 6 HP.",
     points = 5,
-    trigger = once(entered_level_from_star_select("Course 6"))
-        && sublevel_id__mem == 1
-        && never(level_changed())
+    trigger = remained_in_level("Course 6")
         && never(hp() < 0x600 && hp() >= 0x200)
-        && trigger_when(collecting_star_object("spawned star", 0))
+        && trigger_when(collecting_star_object("spawned star", 0)),
+    id=237273,
+    badge="263356"
 )
 
 // C7 timer
@@ -954,7 +1060,9 @@ achievement(
     title = "Phosphor River Race",
     description = "Course 7 - Collect the star 'Deep Dive in Phosphor River' with at least 5 seconds remaining on the timer.",
     points = 5,
-    trigger = in_area("Course 7", 1) && never(screen_changed()) && any_of(array_map(range(0, 239), a => c7_timer_cond(nth_array_object(a))), b => b)
+    trigger = in_area("Course 7", 1) && never(screen_changed()) && any_of(array_map(range(0, 239), a => c7_timer_cond(nth_array_object(a))), b => b),
+    id=237274,
+    badge="263357"
 )
 
 leaderboard(
@@ -1221,7 +1329,9 @@ achievement(
     title = "Coin Collecting with Certain Death",
     description = "Course 8 - Collect all 8 coins from the arrow over quicksand.",
     points = 5,
-    trigger = in_area("Course 8", 1) && never(level_changed()) && any_of(array_map(range(0, 239), a => c8_coin_arrow_cond(nth_array_object(a))), b => b)
+    trigger = in_area("Course 8", 1) && never(level_changed()) && any_of(array_map(range(0, 239), a => c8_coin_arrow_cond(nth_array_object(a))), b => b),
+    id=237275,
+    badge="263358"
 )
 
 function c9_puzzle_activated_cond(obj) {
@@ -1235,13 +1345,13 @@ achievement(
     title = "You're No Fun...",
     description = "Course 9 - Collect the star 'The Furnace Fun Wannabe' without activating any of the puzzles.",
     points = 3,
-    trigger = once(entered_level_from_star_select("Course 9"))
-    && once(sublevel_id__mem == 1 && in_3d_box(3860.0, 4040.0, 600.0, 1000.0, -6540.0, -6600.0))
-    && never(level_changed())
+    trigger = remained_in_level("Course 9")
+        && once(sublevel_id__mem == 1 && in_3d_box(3860.0, 4040.0, 600.0, 1000.0, -6540.0, -6600.0))
+        && all_of(array_map(range(0, 239), a => c9_puzzle_activated_cond(nth_array_object(a))), b => never(b))
     
-    && all_of(array_map(range(0, 239), a => c9_puzzle_activated_cond(nth_array_object(a))), b => never(b))
-    
-    && trigger_when(collecting_star_object("regular star", 5))
+        && trigger_when(collecting_star_object("regular star", 5)),
+    id=237276,
+    badge="263359"
 )
 
 achievement(
@@ -1251,18 +1361,21 @@ achievement(
     trigger = in_area("Guest Course 1", 2)
         && trigger_when(pos_y() > 6800.00 && pos_y() < 7000.00
             && airborne__mem == 0
-            && surface_normal_y(mario_floor_tri()) > 0.99)
+            && surface_normal_y(mario_floor_tri()) > 0.99),
+    id=237277,
+    badge="263360"
 )
 
 achievement(
     title = "Bypassing the Slopes",
     description = "Guest Course 2 - Collect the star 'Slide-Slide for the Star' without butt sliding.",
     points = 5,
-    trigger = once(entered_level_from_star_select("Guest Course 2"))
-        && never(level_changed())
+    trigger = remained_in_level("Guest Course 2")
         && never(mario_action_changed_to("butt slide"))
         && never(mario_action_changed_to("hold butt slide"))
-        && trigger_when(collecting_star_object("regular star", 4))
+        && trigger_when(collecting_star_object("regular star", 4)),
+    id=237278,
+    badge="263361"
 )
 
 achievement(
@@ -1273,30 +1386,34 @@ achievement(
         && once(just_changed_to(sublevel_id__mem, 3))
         && never(level_changed())
         && never(just_took_damage())
-        && trigger_when(collecting_star_object("spawned star", 5))
+        && trigger_when(collecting_star_object("spawned star", 5)),
+    id=237279,
+    badge="263362"
 )
 
 achievement(
     title = "I Still Don't Need Your Gimmick",
     description = "Guest Course 4 - Collect the star 'Zeus's Domain' without jump kicking.",
     points = 10,
-    trigger = once(entered_level_from_star_select("Guest Course 4"))
+    trigger = remained_in_level("Guest Course 4")
         && mission__mem == 5
-        && never(level_changed())
         && never(mario_action_changed_to("air kick"))
-        && trigger_when(collecting_star_object("regular star", 5))
+        && trigger_when(collecting_star_object("regular star", 5)),
+    id=237280,
+    badge="263363"
 )
 
 achievement(
     title = "Not Really a Speedrun nor Water",
     description = "Guest Course 5 - Collect the star 'A Speedrun Over the Water without pressing the purple switch.",
     points = 3,
-    trigger = once(entered_level_from_star_select("Guest Course 5"))
+    trigger = remained_in_level("Guest Course 5")
         && sublevel_id__mem == 1
-        && never(level_changed())
         && never(object_is(stood_on_object(), "purple box switch")
             && object_action(stood_on_object()) == 1)
-        && trigger_when(collecting_star_object("regular star", 0))
+        && trigger_when(collecting_star_object("regular star", 0)),
+    id=237281,
+    badge="263364"
 )
 
 achievement(
@@ -1309,25 +1426,31 @@ achievement(
             && in_3d_box(-2800.0, -2200.0, 7200.0, 7500.0, 1600.0, 2200.0))
         && never(airborne__mem == 0
             && !in_3d_box(-2800.0, -2200.0, 7200.0, 7500.0, 1600.0, 2200.0))
-        && trigger_when(collecting_star_object("regular star", 0))
+        && trigger_when(collecting_star_object("regular star", 0)),
+    id=237282,
+    badge="263365"
 )
 
 achievement(
-    title = "No Cheddar",
-    description = "Cheezepin's Level - Collect the star 'Lightning Way' without collecting any coins.",
-    points = 5,
-    trigger = in_level("Cheezepin")
-        && nof_coins() == 0
-        && trigger_when(collecting_star_object("regular star", 1))
+    title = "To the Moon, Again",
+    description = "Cosmic Wall - Jump too high into the air and hear some fitting music as you Game Over.",
+    points = 1,
+    trigger = in_level("SEGA")
+        && repeated(210, music_id__mem == 83)
+        && never(just_changed_from(music_id__mem, 83)),
+    id=237283,
+    badge="263366"
 )
 
 achievement(
     title = "Keep Your Cool, Again",
     description = "ToasterKetchup's Level - Collect the star 'Slippery Snow' without taking damage.",
     points = 10,
-    trigger = once(entered_level_from_star_select("ToasterKetchup"))
+    trigger = remained_in_level("ToasterKetchup")
         && never(just_took_damage())
-        && trigger_when(collecting_star_object("regular star", 0))
+        && trigger_when(collecting_star_object("regular star", 0)),
+    id=237284,
+    badge="263367"
 )
 
 gamer_mode__mem = bit0(0x40d793)
@@ -1335,14 +1458,16 @@ b3_fight = nth_array_object(3)
 
 achievement(
     title = "Another Bullet Hell",
-    description = "Defeat the final Bowser on Gamer Mode with at least half HP remaining when you press the last switch.",
+    description = "Defeat the final Bowser on Gamer Mode with at least half HP remaining (must talk to Bowser).",
     points = 10,
     trigger = in_level("Final Fight")
         && never(screen_changed())
         && once(just_increased(gamer_mode__mem))
         && hp() >= 0x400
         && object_is(b3_fight, "b3 fight controller")
-        && trigger_when(just_changed(object_action(b3_fight), 3, 4))
+        && trigger_when(object_is(used_object(), "bowser 3")),
+    id=237285,
+    badge="263368"
 )
 
 credits = nth_array_object(0)
@@ -1356,7 +1481,9 @@ achievement(
         && trigger_when(prev(object_credits_mashed_count(credits)) < 1600)
         && trigger_when(prev(object_credits_mashed_count(credits)) >= 1550)
         && (trigger_when(object_credits_mashed_count(credits) == 1600)
-            || measured(object_credits_mashed_count(credits) == 1600))
+            || measured(object_credits_mashed_count(credits) == 1600, when=in_level("End Credits"))),
+    id=237286,
+    badge="263369"
 )
 
 // RP
@@ -1368,59 +1495,86 @@ meta_descriptions = {
     0x21: "In File Select",
 }
 
-course_infos = {
-    "Castle Grounds":   course_meta(0x10, [-1],   "The Overworld"), // Castle Grounds
-    
-    "Course 1":         course_meta(0x09, [-1],   "Vicky's Onsen 64"),
-    "Course 2":         course_meta(0x18, [-1],   "Garbage Garage"), // 2 areas
-    
-    "Course 3":         course_meta(0x0c, [-1],   "Valley of the Winter Runner"),
-        // Area 2 - winter runner jail
-        // Area 3 - garden
-        // Area 4 - upwards temple
-        // Area 5 - bully battle
-    
-    "Course 4":         course_meta(0x05, [-1],   "Sand Bird Sanctuary"),
-        // Area 2 - eyerok fight
-        // Area 3 - sand bird
-        // Area 4 - same as area 1, but with egg hatched
-        // Area 5 - cliff side cave (without Klepto)
-        // Area 6 - cliff side cave (with Klepto)
-        // Area 7 - blocked off cave
-
-    "Slide":            course_meta(0x1b, [-1],   "Secret Area"),
-    "Aquarium":         course_meta(0x14, [-1],   "Break the Targets"),
-    
-    "Bowser 1":         course_meta(0x11, [-1],   "Bowser's Covenance"),
-    "Key 1":            course_meta(0x1e, [-1],   "Bowser's Covenance"),
-
-    "End Cake Picture": course_meta(0x19, [-1], "The End")
-}
-
 general_level_dict = {
-    0x10: "exploring the looping overworld",
+    0x10: "exploring the first overworld",
+    0x1a: "not doing much in the third overworld",
     
-    0x09: "visiting Vicky's onsen",
-    0x18: "outside gmd's Garbage Garage",
-    0x0C: "in a valley with the Winter Runner",
-    0x05: "helping some buddies in Sand Bird Sanctuary",
-
-    0x1b: "in a secret area (well done!)",
-    0x14: "on a mission to break targets",
+    0x09: "hanging around in Treetrunk Valley",
+    0x18: "feeling like Samus in Brinstar Jungle",
+    0x0C: "jumping around in City in the Sky",
+    0x05: "grooving in Bustin' Dusk Beach",
+    0x04: "exploring a multicolored Pyramid Desert",
+    0x07: "having frostburn in Burning Arctic Cavern",
+    0x16: "glowing with excitement in Cryptic Phosphor Tower",
+    0x08: "visiting China in Dragon Road Chun-Nan",
+    0x17: "making magic happen in Hang Mystic Mansion",
     
-    0x11: "platforming in Bowser's Covenance",
-    0x1e: "taking on Bowser",
+    0x0b: "taking down old enemies in The Classic Stage",
+    0x24: "getting revenge on stars in Mountain Above the Clouds",
+    0x0d: "meeting new friends in Vintage Castle",
+    0x0e: "embracing the flame in Temple of Prometheus",
+    0x0f: "on a papercraft adventure in Autumn Mountain",
+    
+    0x1c: "on an excavating mission in Pyramid Cavern",
+    0x1d: "flying to the finish at Pink Flying House",
+    0x12: "within the hack creators' Halls of Fame",
 
-    0x19: "at the ending screen",
+    0x13: "rising above in Ascended Paradise", // cheeze
+    0x1b: "jumping and sliding in Freezeflame Trials", // toaster
+    
+    0x11: "on a cold journey in the Ice Mines",
+    0x1e: "fighting Bowser in the Ice Mines",
+    0x15: "not enjoying the theme park at the Crimson Carnival",
+    0x22: "facing the Final Bowser in the Crimson Carnival",
 }
+
+level_06__lookup = rich_presence_lookup("Level06", sublevel_id__mem, {
+    0x01: "burning with energy in the second overworld",
+    0x02: "freezing in the night in the second overworld"
+})
+
+level_14__lookup = rich_presence_lookup("Level14", sublevel_id__mem, {
+    0x01: "avoiding flying enemies in Airship Force", // crash
+    0x02: "maneuvering through the ruins of Jungle Falls", // kaze
+    0x03: "climbing the equipment in Planet Wisp Construction"
+})
+
+level_1f__lookup = rich_presence_lookup("Level1f", sublevel_id__mem,{
+    0x01: "on a runaway vehicle in Cosmic Cart Joy Ride",
+    0x02: "manipulating gravity in Cosmic Wall"
+})
+
+level_0a__lookup = rich_presence_lookup("Level0a", sublevel_id__mem,{
+    0x01: "trapped in a tiny box in the End Credits",
+    0x02: "about to crash the game due to having cheated",
+})
 
 level__lookup = rich_presence_lookup("LevelsWithoutSublevels", level_id__mem, general_level_dict, "in an unbeknownst location")
 
-//rich_presence_conditional_display(in_title_or_file_select(), 
-//    "{0}", rich_presence_lookup("Fileless", music_id__mem, meta_descriptions))
-//rich_presence_conditional_display(
-//    mem_in(level_id__mem, general_level_dict),
-//    "Mario is {0} with {1}⭐ [🔴{2}]", level__lookup, stars__value,
-//        rich_presence_lookup("Switch", pressed_switch__mem("red"), {1:"▣"}, "▢")
-//)
-//rich_presence_display("Having some summer fun in this collab hack.")
+stars__value = rich_presence_value("Number", nof_stars())
+
+file__lookup  = rich_presence_lookup("File", file_num__mem, {
+    0x01: "A", 0x02: "B", 0x03: "C", 0x04: "D"
+}, "??")
+
+function rp_cond_same_display(cond, lookup) {
+    rich_presence_conditional_display(cond, 
+    "Mario-{2} is {0} with {1}⭐ [🔴{3}] [🟢{4}]", lookup, stars__value, file__lookup, 
+        rich_presence_lookup("Switch", pressed_switch__mem("red"), {1:"▣"}, "▢"),
+        rich_presence_lookup("Switch", pressed_switch__mem("green"), {1:"▣"}, "▢")
+    )
+}
+
+cond_displays = {
+    "general": {"cond": mem_in(level_id__mem, general_level_dict), "lookup": level__lookup},
+    "level14": {"cond": (level_id__mem == 0x14), "lookup": level_14__lookup},
+    "level1f": {"cond": (level_id__mem == 0x1f), "lookup": level_1f__lookup},
+    "level0a": {"cond": (level_id__mem == 0x0a), "lookup": level_0a__lookup},
+    "level06": {"cond": (level_id__mem == 0x06), "lookup": level_06__lookup},
+}
+
+rich_presence_conditional_display(in_title_or_file_select(), "{0}", rich_presence_lookup("Fileless", music_id__mem, meta_descriptions))
+for k in cond_displays {
+    rp_cond_same_display(cond_displays[k]["cond"], cond_displays[k]["lookup"])
+}
+rich_presence_display("On a grand adventure through many different levels.")
