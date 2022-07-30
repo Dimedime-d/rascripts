@@ -459,9 +459,12 @@ function collecting_star_object(obj_name, mission) {
            && object_star_mission(obj) == mission
 }
 
-function using_teleporter(id) {
+// tkt 50250 - add a delta for obj != teleporter to prevent popping during level transition
+// note: interaction object is cleared upon switching screens (generally set to Mario Spawn / Pipe)
+function just_used_teleporter(id) {
     obj = interaction_object()
     return obj != 0
+        && !object_was(obj, "teleporter")
         && object_is(obj, "teleporter")
         && object_teleporter_id(obj) == id
 }
