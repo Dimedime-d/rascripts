@@ -100,6 +100,7 @@ mario__struct = { // https://github.com/n64decomp/sm64/blob/master/include/types
     "wall triangle pointer":    0x60, // dword (pointer to tri)
     "ceiling triangle pointer": 0x64, // dword (pointer to tri)
     "floor triangle pointer":   0x68, // dword (pointer to tri)
+    "floor yaw":          0x76,
     "interaction object": 0x78,  // dword (pointer to object)
     "held object":        0x7C,  // dword (pointer to object)
     "used object":        0x80,  // dword (pointer to object) - like 
@@ -162,6 +163,8 @@ function in_3d_box(x1, x2, y1, y2, z1, z2, check_edges=0) {
 function mario_wall_tri() => tbyte(mario_field("wall triangle pointer"))
 function mario_ceil_tri() => tbyte(mario_field("ceiling triangle pointer"))
 function mario_floor_tri() => tbyte(mario_field("floor triangle pointer"))
+
+function mario_floor_yaw() => word(mario_field("floor yaw"))
 
 function interaction_object() => tbyte(mario_field("interaction object"))
 function held_object() => tbyte(mario_field("held object"))
@@ -780,7 +783,7 @@ function sum_star_bits(file_offset, bits) {
 course_offsets = {
     "Course 1":  course_stars_meta(sum_star_bits(0x0f, range(0, 6)), 10, "Tree of Life", id=237225, badge="263308"),
     "Course 2":  course_stars_meta(sum_star_bits(0x0e, range(0, 6)), 10, "Go the Jungle Adventure", id=237226, badge="263309"),
-    "Course 3":  course_stars_meta(sum_star_bits(0x0d, range(0, 6)), 10, "Skyline Before Twilight", id=237227, badge="10"),
+    "Course 3":  course_stars_meta(sum_star_bits(0x0d, range(0, 6)), 10, "Skyline Before Twilight", id=237227, badge="263310"),
     "Course 4":  course_stars_meta(sum_star_bits(0x0c, range(0, 6)), 10, "Beach Party", id=237228, badge="263311"),
     "Course 5":  course_stars_meta(sum_star_bits(0x13, range(0, 6)), 10, "Oasis in the Desert", id=237229, badge="263312"),
     "Course 6":  course_stars_meta(sum_star_bits(0x12, range(0, 6)), 10, "First Freezeflame Trials", id=237230, badge="263313"),
@@ -1018,7 +1021,7 @@ achievement(
     points = 5,
     trigger = in_level("Overworld 1")
         && disable_when(just_increased(wearing_wing_cap()), until=screen_changed())
-        && using_teleporter(0x22),
+        && just_used_teleporter(0x22),
     id=237271,
     badge="263354"
 )
@@ -1357,14 +1360,15 @@ achievement(
     badge="263359"
 )
 
+// ticket 50287 - checking floor normal y didn't work for some reason - use backup logic within mario struct
 achievement(
     title = "Great View up Here",
-    description = "Guest Course 1 - Stand on top of the roof of the Whomps' fortress (the second area).",
+    description = "Guest Course 1 - Stand on top of the roof of the Whomps' fortress (the highest point of the second area).",
     points = 5,
     trigger = in_area("Guest Course 1", 2)
         && trigger_when(pos_y() > 6800.00 && pos_y() < 7000.00
             && airborne__mem == 0
-            && surface_normal_y(mario_floor_tri()) > 0.99),
+            && mario_floor_yaw() == 0),
     id=237277,
     badge="263360"
 )
