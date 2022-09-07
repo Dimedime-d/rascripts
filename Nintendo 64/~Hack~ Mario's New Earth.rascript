@@ -24,6 +24,24 @@ function struct_field(struct_def, base, field) => base + struct_def[field]
 
 function object_field(base, field) => struct_field(object__struct, base, field)
 
+function mem_access(addr, type, delta=0, bit_ind=-1) {
+    mem = 0
+    if (type == "dword") mem = dword(addr)
+    else if (type == "word")  mem = word(addr)
+    else if (type == "byte")  mem = byte(addr)
+    else if (type == "bit")   mem = bit(bit_ind, addr)
+    else if (type == "bitcount") mem = bitcount(addr)
+    else if (type == "float")    mem = float(addr)
+    else if (type == "word_be")  mem = word_be(addr)
+    else if (type == "tbyte_be") mem = tbyte_be(addr)
+    else if (type == "dword_be") mem = dword_be(addr)
+    
+    if (delta > 0)
+        return prev(mem)
+    else
+        return mem
+}
+
 // ---------------
 //   m e m o r y
 // ---------------
@@ -394,23 +412,49 @@ object__struct = {
 }
 object__sizeof = 0x260
 
-behaviour_script__values = {
-    "king bob-omb":             0x800eb374,
-    "bowser 3":                 0x800ec9d0,
-    "real baby penguin":        0x800ed268,
-    "blue coin block":          0x800ed6e8,
-    "king whomp":               0x800edd38,
-    "secret star spawner":      0x800ef05c,
-    "koopa the quick flag":     0x800ef778,
-    "eyerok manager":           0x800f0434,
-    "file select background":   0x8008fcf0,
+// these checks gotta be unique
+// also, just do simple offset checks, no more nested pointers...
+function bhv_cmd_check_meta(offset, type, value) => {"offset": offset, "type": type, "value": value}
+object_behavior_checks = {
+    "bowser 3":     bhv_cmd_check_meta(0x74, "dword", 0x802b75a4),
+    "king bob-omb": bhv_cmd_check_meta(0x58, "dword", 0x802a8064),
+    "real baby penguin": bhv_cmd_check_meta(0x4c, "dword", 0x802bfa88),
+    "blue coin block":   bhv_cmd_check_meta(0x18, "dword", 0x802c2404),
+    "king whomp":        bhv_cmd_check_meta(0x10, "dword", 0x13002bd4),
+    "koopa the quick flag": bhv_cmd_check_meta(0x24, "dword", 0x06001028),
+    "eyerok manager":       bhv_cmd_check_meta(0x14, "dword", 0x8030ea9c),
 }
+
+//behaviour_script__values = {
+//    "king bob-omb":             0x800eb374,
+//    "bowser 3":                 0x800ec9d0,
+//    "real baby penguin":        0x800ed268,
+//    "blue coin block":          0x800ed6e8,
+//    "king whomp":               0x800edd38,
+//    //"secret star spawner":      0x800ef05c,
+//    "koopa the quick flag":     0x800ef778,
+//    "eyerok manager":           0x800f0434,
+//    "file select background":   0x8008fcf0,
+//}
 
 function object_is_active(addr) => word(object_field(addr, "active")) == 0x0101
 function object_was_active(addr) => prev(word(object_field(addr, "active"))) == 0x0101
 function object_just_deactivated(addr) => object_was_active(addr) && !object_active(addr)
 
-function object_is(addr, name) => dword(object_field(addr, "behaviour script")) == behaviour_script__values[name]
+function object_behav_script(addr) => tbyte(object_field(addr, "behaviour script"))
+//function object_is(addr, name) => dword(object_field(addr, "behaviour script")) == behaviour_script__values[name]
+
+function object_behavior_check(addr, check, delta=0) {
+    offset = check["offset"]
+    type = check["type"]
+    value = check["value"]
+    if (delta > 0)
+        return prev(mem_access(object_behav_script(addr) + offset, type)) == value
+    else
+        return mem_access(object_behav_script(addr) + offset, type) == value
+}
+
+function object_is(addr, name) => object_behavior_check(addr, object_behavior_checks[name], delta=0)
 
 function object_num_collided_objects(addr) => word(object_field(addr, "num collided objects"))
 function object_nth_collided_object(addr, n) => tbyte(object_field(addr, format("collided object {0}", n)))
@@ -734,6 +778,7 @@ achievement(
     badge="211393"
 )
 
+// c'mon RATools, don't optimize out the ResetNextIf ffs
 got_one_red = nof_coins() == prev(nof_coins()) + 2
 function course_11_challenge_trigger() {
     entered_c11 = never(!in_level("Course 11")) && once(in_level("Overworld 3", check_sublevels=0, delta=1))
