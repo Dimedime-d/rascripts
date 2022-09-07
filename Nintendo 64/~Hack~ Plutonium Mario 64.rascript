@@ -31,6 +31,24 @@ function just_changed_from(mem, from) => prev(mem) == from && mem != from
 
 function struct_field(struct_def, base, field) => base + struct_def[field]
 
+function mem_access(addr, type, delta=0, bit_ind=-1) {
+    mem = 0
+    if (type == "dword") mem = dword(addr)
+    else if (type == "word")  mem = word(addr)
+    else if (type == "byte")  mem = byte(addr)
+    else if (type == "bit")   mem = bit(bit_ind, addr)
+    else if (type == "bitcount") mem = bitcount(addr)
+    else if (type == "float")    mem = float(addr)
+    else if (type == "word_be")  mem = word_be(addr)
+    else if (type == "tbyte_be") mem = tbyte_be(addr)
+    else if (type == "dword_be") mem = dword_be(addr)
+    
+    if (delta > 0)
+        return prev(mem)
+    else
+        return mem
+}
+
 offsets = {
     "SAVE DATA":    (0x207700 - 0x70),
     
@@ -58,30 +76,58 @@ offsets = {
     "RED COINS COLLECTED":  0x3613fd,
 }
 
-// double-check this list between hacks, custom objects can shift things...
-behaviour_script__values = { 
-    "large cork box":   0x800EC660,
-    "purple box switch":0x800EC62C,
-    "koopa shell":      0x800ED0BC,
-    "exclamation box":  0x800ED3D0,
-    
-    "boo":              0x800ED964,
-    "boo activates text":0x800ED984,
-    "small chill bully":0x800EE848,
-    "crate":            0x800EED24,
-    "ice cube":         0x800EEDD8,
+// https://retroachievements.org/ticketmanager.php?i=51203
+// End cake picture to title screen shifts behavior script values, so must check what they point to!
 
-    "impartial 1-up":   0x800EF15C,
-    "stationary 1-up":  0x800EF1FC,
-    "running away 1-up":0x800EF190,
-    "chasing 1-up":     0x800EF2C8,
-    "1-up in pole activator":   0x800EF300,
+// these checks gotta be unique
+// also, just do simple offset checks, no more nested pointers...
+function bhv_cmd_check_meta(offset, type, value) => {"offset": offset, "type": type, "value": value}
+object_behavior_checks = {
+    //!! cannot distinguish between grills/objects/boxes switch
+    "purple box switch":bhv_cmd_check_meta(0x0c, "dword", 0x13001488),
+    "koopa shell":      bhv_cmd_check_meta(0x24, "dword", 0x802bd680),
     
-    "stationary star":  0x800EEFBC,
-    "spawned star":     0x800EEFE4,
+    //!! cannot distinguish between ordinary boo and merry go round boo
+    "boo":              bhv_cmd_check_meta(0x0c, "dword", 0x13002808),
+    "boo activates text":bhv_cmd_check_meta(0x54, "dword", 0x802c3440),
+    "small chill bully":bhv_cmd_check_meta(0x20, "dword", 0x802eb05c),
+    "crate":            bhv_cmd_check_meta(0x1c, "dword", 0x803839cc),
+    "ice cube":         bhv_cmd_check_meta(0x18, "dword", 0x802f084c),
     
-    "skeeter":          0x800F05E8,
+    "impartial 1-up":   bhv_cmd_check_meta(0x2c, "dword", 0x802f40cc),
+    "running away 1-up":bhv_cmd_check_meta(0x2c, "dword", 0x802f4248),
+    "stationary 1-up":  bhv_cmd_check_meta(0x30, "dword", 0x802f45b8),
+    "chasing 1-up":     bhv_cmd_check_meta(0x30, "dword", 0x802f496c),
+    "1-up in pole activator": bhv_cmd_check_meta(0x1c, "dword", 0x802f4b00),
+    
+    "stationary star":  bhv_cmd_check_meta(0x20, "dword", 0x802f25b0),
+    "spawned star":     bhv_cmd_check_meta(0x20, "dword", 0x802f2768),
+    
+    "skeeter":          bhv_cmd_check_meta(0x30, "dword", 0x80313110),
 }
+//behaviour_script__values = { 
+//    //"large cork box":   0x800EC660,
+//    "purple box switch":0x800EC62C,
+//    "koopa shell":      0x800ED0BC,
+//    //"exclamation box":  0x800ED3D0,
+//    
+//    "boo":              0x800ED964,
+//    "boo activates text":0x800ED984,
+//    "small chill bully":0x800EE848,
+//    "crate":            0x800EED24,
+//    "ice cube":         0x800EEDD8,
+//
+//    "impartial 1-up":   0x800EF15C,
+//    "stationary 1-up":  0x800EF1FC,
+//    "running away 1-up":0x800EF190,
+//    "chasing 1-up":     0x800EF2C8,
+//    "1-up in pole activator":   0x800EF300,
+//    
+//    "stationary star":  0x800EEFBC,
+//    "spawned star":     0x800EEFE4,
+//    
+//    "skeeter":          0x800F05E8,
+//}
 
 // ---------------
 //   m e m o r y
@@ -218,6 +264,7 @@ mario_action__values = {
     
     "death exit landing":          0x00020467,
     "burning ground":              0x00020449,
+    "handstand":                   0x01000345,
     "burning jump":                0x010208B4,
     "burning fall":                0x010208B5,
     
@@ -287,7 +334,7 @@ object__struct = {
     
     "hp":                   0x184,  // dword
     "star mission":         0x18b,  // byte (actually 0x188, but weirdness...)
-    "behaviour script":     0x20c,  // dword
+    "behaviour script":     0x20c,  // dword (CHANGE to tbyte when using as pointer)
 }
 object__sizeof = 0x260
 
@@ -302,9 +349,21 @@ function object_active(addr) => bit(0, object_field(addr, "active"))
 
 function object_just_deactivated(addr) => prev(object_active(addr)) != 0 && object_active(addr) == 0
 
-function object_behav_script(addr) => dword(object_field(addr, "behaviour script"))
+function object_behav_script(addr) => tbyte(object_field(addr, "behaviour script"))
 function object_is(addr, name) => object_behav_script(addr) == behaviour_script__values[name]
-function object_was(addr, name) => prev(object_behav_script(addr)) == behaviour_script__values[name]
+
+function object_behavior_check(addr, check, delta=0) {
+    offset = check["offset"]
+    type = check["type"]
+    value = check["value"]
+    if (delta > 0)
+        return prev(mem_access(object_behav_script(addr) + offset, type)) == value
+    else
+        return mem_access(object_behav_script(addr) + offset, type) == value
+}
+
+function object_is(addr, name) => object_behavior_check(addr, object_behavior_checks[name], delta=0)
+function object_was(addr, name) => object_behavior_check(addr, object_behavior_checks[name], delta=1)
 
 function object_num_collided_objects(addr) => word(object_field(addr, "num collided objects"))
 function object_nth_collided_object(addr, n) => tbyte(object_field(addr, format("collided object {0}", n)))
@@ -382,7 +441,8 @@ for val in star_dance_anim_values {
 function mario_collision_check(obj_addr, obj_name, nth_collided) {
     return object_num_collided_objects(mario_object()) >= nth_collided
             && (
-                (obj_addr != prev(obj_addr)) 
+                object_just_deactivated(obj_addr)
+                || (obj_addr != prev(obj_addr)) 
                 || (object_behav_script(obj_addr) != prev(object_behav_script(obj_addr)))
                 || (object_num_collided_objects(mario_object()) != prev(object_num_collided_objects(mario_object())))
                )
@@ -781,15 +841,14 @@ function tally_all_1ups(tallies=[], total_count=0)
             
             coll_check = mario_collision_check(obj_addr, obj_name, i)
             
+            // this 1-up is tangible while it is sparkling, so need additional action check
             if (obj_name == "chasing 1-up") {
             // https://github.com/n64decomp/sm64/blob/master/src/game/behaviors/mushroom_1up.inc.c
+                // even if you are on top of the 1-up while handstanding, this will still hit
                 coll_check1 = coll_check && object_action(obj_addr) == 1
-                coll_check2 = coll_check && object_action(obj_addr) == 3
-                    && object_timer(obj_addr) >= 37
-                array_push(mushie_tally,
-                    repeated(t["count"], coll_check1))
-                array_push(mushie_tally,
-                    repeated(t["count"], coll_check2))
+                //coll_check2 = coll_check && object_action(obj_addr) == 3&& object_timer(obj_addr) >= 37
+                array_push(mushie_tally, repeated(t["count"], coll_check1))
+                //array_push(mushie_tally, repeated(t["count"], coll_check2))
             }
             else {
                 array_push(mushie_tally,
@@ -860,10 +919,10 @@ mushies_data = {
         [{"type": "stationary", "count": 2},], numbered_course = 0, id=213219, badge="235501"),
     "Bowser 2": mushies_meta("Rusty Lifesaver Part 1", 2, 
         [{"type": "stationary", "count": 1}, // 1 stationary is unobtainable
-         {"type": "chasing", "count": 1}], id=213205, badge="235487"),
+         {"type": "chasing", "count": 1}], numbered_course = 0, id=213205, badge="235487"),
     "Key 2": mushies_meta("Rusty Lifesaver Part 2", 2, 
         [{"type": "stationary", "count": 1}, 
-         {"type": "running away", "count": 1}], id=213220, badge="235502"),
+         {"type": "running away", "count": 1}], numbered_course = 0, id=213220, badge="235502"),
     
     "Bowser 3": mushies_meta("Lifesaver Pluto", 10, 
         [{"type": "stationary", "count": 4}, 
