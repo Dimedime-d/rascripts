@@ -1644,7 +1644,7 @@ achievement(
     trigger = remained_in_level("Course 15", hit=1)
         && mission__mem == 5
         && never(just_took_damage())
-        && trigger_when(collecting_star_object("spawned star", 5)),
+        && trigger_when(collecting_star_object("spawned star", 4)),
     id=256566,
     badge="284501"
 )
@@ -1655,6 +1655,7 @@ achievement(
     points = 25,
     trigger = remained_in_level("Bowser 3", hit=1)
         && never(just_increased(hp_decrement())) // when you collect a coin on top of an enemy, you don't lose HP
+        && never(just_took_damage())
         && trigger_when(collecting_star_object("spawned star", 5)),
     id=256567,
     badge="284502"
