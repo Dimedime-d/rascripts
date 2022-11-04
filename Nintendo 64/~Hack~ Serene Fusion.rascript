@@ -77,12 +77,14 @@ offsets = {
     
     //"LEVEL INDEX":      0x33bac8,
     //"SUBMAP ID":        0x33b249,
-    
+    "LAKITU STATE":     0x20e4a8,
     "TIME COUNTING":    0x20e765,
+    "WARPDEST":         0x20e774,
     "HUD FLAGS":        0x20e78c,   //  https://github.com/n64decomp/sm64/blob/1372ae1bb7cbedc03df366393188f4f05dcfc422/src/game/level_update.h#L91
     "HUD TIMER":        0x20e792,
     
     "WARP TRANSITION":  0x20d530,
+    "OBJECT CUTSCENE":  0x201304,
     "MISSION ACTIVE":   0x2013ae,
     
     "MARIO STRUCT":     0x20e794,
@@ -94,7 +96,36 @@ offsets = {
 
 // double-check this list between hacks, custom objects can shift things...
 behaviour_script__values = { 
+    "golf sphere":          0x803aa000,
+
+    "luigiman switch":      0x803aa154,
+
+    "rovert hyperblock":    0x803aa3b0,
+    "spiders death":        0x803aa4b0,
+
+    "aglab fight":          0x803aaa5c,
+
+    "mushie ctl":           0x803aacfc,
+
+    "hf joel":              0x803aad48,
+
+    "mtc brick":            0x803aafec,
+    "mtc red ground":       0x803ab00c,
+
+    "ab troll":             0x803ab378,
+    "ab sand":              0x803ab3ac,
+
+    "wooden post":          0x803ac2e0,
+    "koopa flag checkpoint":0x803ac5bc,
+    "hidden secret":        0x803acc74,
+    "spawned star":         0x803acd28,
+    "regular star":         0x803acd50,
     "blue coin for block":  0x803ae5b4,
+    "exclamation box":      0x803ae8e0,
+    "koopa shell":          0x803aebd0,
+    
+    "100 coin star":        0x803b02e0,
+    "scut switch":          0x803b0ab0,
 }
 
 // ---------------
@@ -137,6 +168,7 @@ function mario_field(field) => struct_field(mario__struct, mario__addr, field)
 
 mario__addr = offsets["MARIO STRUCT"]
 stood_on_object__addr = offsets["STOOD ON OBJECT"]
+object_cutscene__addr = offsets["OBJECT CUTSCENE"]
 
 function hat_in_hand()        => bit5(mario_field("hat bitflags"))
 function hat_on_head()        => bit4(mario_field("hat bitflags"))
@@ -187,6 +219,7 @@ function used_object()  => tbyte(mario_field("used object"))
 function mario_object() => tbyte(mario_field("mario object"))
 function mario_area() => tbyte(mario_field("area"))
 function stood_on_object() => tbyte(stood_on_object__addr)
+function object_cutscene() => tbyte(object_cutscene__addr)
 
 function controller() => tbyte(mario_field("controller"))
 
@@ -196,6 +229,7 @@ function controller() => tbyte(mario_field("controller"))
 function controller_a_button() => bit(15, controller() + 0x12)
 function controller_b_button() => bit(14, controller() + 0x12)
 function controller_z_button() => bit(13, controller() + 0x12)
+function controller_l_button() => bit(5, controller() + 0x12)
 
 function hp_int() => byte(mario_field("hp") + 1)
 
@@ -253,7 +287,9 @@ mario_action__values = {
     
     "dive slide":                  0x00880456,
     "butt slide":                  0x00840452,
-    "hold butt slide":             0x00840454,
+    "stomach slide":               0x008C0453,
+    "crouch slide":                0x04808459,
+    "hold butt slide":             0x00840454, // while holding an object
 }
 
 function mario_action_is(name) => mario_current_action__mem == mario_action__values[name]
@@ -269,7 +305,10 @@ star_grab_actions = ["star dance ground (exit)", "star dance water", "star dance
 
 burning_actions = ["burning ground", "burning jump", "burning fall"]
 
+sliding_actions = ["dive slide", "butt slide", "stomach slide", "crouch slide"]
+
 airborne__mem = bit3(mario_current_action__addr + 1)
+swimming__mem = bit5(mario_current_action__addr + 1)
 butt_or_belly_sliding__mem = bit2(mario_current_action__addr + 2)
 on_pole__mem = bit4(mario_current_action__addr + 2)
 
@@ -314,12 +353,62 @@ camera__sizeof = 0x6c
 
 function camera_field(base, field) => struct_field(camera__struct, base, field)
 
-function camera_focus_x(addr) => float(camera_field(addr, "focus x"))
-function camera_focus_y(addr) => float(camera_field(addr, "focus y"))
-function camera_focus_z(addr) => float(camera_field(addr, "focus z"))
+function camera_focus(addr, coord) => float(camera_field(addr, format("focus {0}", coord)))
+
+lakitu_state__struct = {
+    "pos x":          0x00, // float
+    "pos y":          0x04, // float
+    "pos z":          0x08, // float
+    "focus x":        0x0C, // float
+    "focus y":        0x10, // float
+    "focus z":        0x14, // float    
+    "goal focus x":   0x18, // float
+    "goal focus y":   0x1C, // float
+    "goal focus z":   0x20, // float
+    "goal pos x":     0x24, // float
+    "goal pos y":     0x28, // float
+    "goal pos z":     0x2C, // float      
+}
+lakitu_state__addr = offsets["LAKITU STATE"]
+
+function lakitu_state_field(field, addr) {
+    if (addr == -1)
+        this_addr = lakitu_state__addr
+    else
+        this_addr = addr
+    struct_field(lakitu_state__struct, this_addr, field)
+    }
+
+function lakitu_state_goal_focus(coord, addr=-1) {
+    return float(lakitu_state_field(format("goal focus {0}", coord), addr))
+    }
 
 // shortcut
 function camera() => area_camera(mario_area())
+
+//https://github.com/n64decomp/sm64/blob/1372ae1bb7cbedc03df366393188f4f05dcfc422/src/game/level_update.h#L73
+warp_dest__struct = {
+    "node":         0x00,
+    "area id":      0x01, 
+    "level id":     0x02,
+    "type":         0x03,
+}
+warp_dest__addr = offsets["WARPDEST"]
+
+function warp_dest_field(field, addr) {
+    if (addr == -1)
+        this_addr = warp_dest__addr
+    else
+        this_addr = addr
+    struct_field(warp_dest__struct, this_addr, field)
+    }
+
+function warp_dest_node(addr=-1) => byte(warp_dest_field("node", addr))
+function warp_dest_area(addr=-1) => byte(warp_dest_field("area", addr))
+function warp_dest_level(addr=-1) => byte(warp_dest_field("level", addr))
+function warp_dest_type(addr=-1) => byte(warp_dest_field("type", addr))
+
+function death_warp_in_level() => just_changed_to(warp_dest_type(), 3) && warp_dest_node() == 0xf1 // see level_update.h for standard warp nodes/types
 
 // ----------------- //
 //   o b j e c t s   //
@@ -339,6 +428,7 @@ object__struct = {
     "collided object 4":     0x84,  // dword (pointer to object)
     "boo death status":      0x88,  // dword (https://github.com/n64decomp/sm64/blob/1372ae1bb7cbedc03df366393188f4f05dcfc422/include/object_fields.h#L236)
     "koopa flag race started":0xF4, // dword
+    "num secrets":            0xF4, // dword
     "eyerok hands remaining": 0xF8, // dword
     "koopa flag ktq finished":0xF8, // dword
     "crystal tap water level":0xF8, // dword
@@ -348,6 +438,7 @@ object__struct = {
     "subtype":              0x144,  // dword
     "action":               0x14c,  // dword
     "timer":                0x154,  // dword
+    "distance to mario":    0x15c,  // float (ONLY when obj flag is set to compute it)
     
     "home x":               0x164,  // float
     "home y":               0x168,  // float
@@ -396,6 +487,8 @@ function object_num_collided_objects(addr) => word(object_field(addr, "num colli
 function object_nth_collided_object(addr, n) => tbyte(object_field(addr, format("collided object {0}", n)))
 
 // object specific
+function object_num_secrets(addr) => dword(object_field(addr, "num secrets"))
+
 function object_king_whomp_hp(addr) => dword(object_field(addr, "hp"))
 function object_boo_death_status(addr) => dword(object_field(addr, "boo death status"))
 function object_crystal_tap_water_level(addr) => dword(object_field(addr, "crystal tap water level"))
@@ -426,7 +519,7 @@ function object_pos_home_at(addr, pos) {
 }
 
 function object_timer(addr) => dword(object_field(addr, "timer"))
-
+function object_distance_to_mario(addr) => float(object_field(addr, "distance to mario"))
 function object_health(addr) => dword(object_field(addr, "hp"))
 
 // object specific
@@ -436,6 +529,9 @@ function object_teleporter_id(addr) => word(object_field(addr, "teleporter id"))
 function object_coin_formation_collects(addr) => bitcount(object_field(addr, "collected coins"))
 
 // Mario Object specific stuff
+
+// generic (ex: any wooden post)
+function ground_pounding_object(name) => mario_action_is("ground pound landing") && object_is(stood_on_object(), name)
 
 // watch out for animation value collisions (ex: airborne spawn and falling out of water both use general fall, 0x56)
 mario_anim__values = {
@@ -584,7 +680,7 @@ hacktice__addr = offsets["HACKTICE FLAG"]
 
 function hacktice_enabled() => bit0(hacktice__addr)
 
-function pause_lock_hacktice_in_level(name) => disable_when(hacktice_enabled() == 1, until=!in_level(name))
+function pause_lock_hacktice_in_level(name) => disable_when(hacktice_enabled() == 1, until=level_changed())
 
 function int_seconds_to_frames(seconds) => seconds * 30
 
@@ -644,6 +740,7 @@ level_id__mem = byte(level_id__addr)
 
 music_id__addr = offsets["MUSIC ID"]
 music_id__mem  = byte(music_id__addr)
+music_tempo__mem = word(music_id__addr + 2) // cba to define the sequence player struct
 
 function boss_music_ended() => prev(music_id__mem) == 0x16 && music_id__mem != 0x16 // be careful of other things (cap blocks, etc.) that overwrite current music...
 
@@ -718,7 +815,7 @@ function in_area(name, area=-1) {
     return level_id__mem == course_infos[name]["value"] && area_check
 }
 
-function in_same_level_from_last_frame() => level_id__mem == prev(level_id__mem) && sublevel_id__mem == prev(sublevel_id__mem)
+function in_same_level_from_last_frame() => level_id__mem == prev(level_id__mem) && area__mem == prev(area__mem)
 
 //function entered_level_from_star_select(name) => in_level(name) && just_changed_from(music_id__mem, 0x0D) // careful, specific to this hack (AMA)
 
@@ -728,7 +825,7 @@ function level_changed(except_when_entering="") {
         cond = cond && !in_level(except_when_entering)
     return cond
 }
-function screen_changed() => just_changed_any(level_id__mem) || just_changed_any(sublevel_id__mem)
+function screen_changed() => just_changed_any(level_id__mem) || just_changed_any(area__mem)
 
 // the hit is for challenges that, if failed, require re-entering the level
 function remained_in_level(name, hit=1) {
@@ -879,15 +976,448 @@ for milestone in milestones {
 
 // Misc / Challenges
 
+ab_sand = nth_array_object(14)
+achievement(
+    title = "Depth Climbing Like It's 2012",
+    description = format("Collect the star 'Climb Out of the Dried Valley' in {0} without falling down (no fading out).", course_infos["Course 1"]["full name"]),
+    points = 5,
+    trigger = pause_lock_hacktice_in_level("Course 1")
+        && remained_in_level("Course 1", hit=0)
+        && object_is(ab_sand, "ab sand")
+        && once(just_changed(object_action(ab_sand), 0, 1))
+        && never(just_changed(object_action(ab_sand), 1, 2))
+        && trigger_when(collecting_star_object("spawned star", 2))
+)
+
+ab_troll = nth_array_object(1)
+achievement(
+    title = "Gotta Face the Fire",
+    description = format("Climb the Wall of Failure in {0} the wrong way and get denied the star.", course_infos["Course 1"]["full name"]),
+    points = 1,
+    trigger = pause_lock_hacktice_in_level("Course 1")
+        //&& in_level("Course 1")
+        && object_is(ab_troll, "ab troll")
+        && airborne__mem == 0
+        && object_distance_to_mario(ab_troll) > 100.0
+        && object_distance_to_mario(ab_troll) < 400.0
+)
+
+got_one_red = nof_coins() == prev(nof_coins()) + 2
+
+achievement(
+    title = "Dry Diving",
+    description = format("Collect the star 'An Abyss Deep Dive' in {0} without swimming.", course_infos["Course 1"]["full name"]),
+    points = 5,
+    trigger = pause_lock_hacktice_in_level("Course 1")
+        && remained_in_level("Course 1", hit=1)
+        && area__mem == 1
+        && once(got_one_red)
+        && never(just_increased(swimming__mem))
+        && trigger_when(collecting_star_object("spawned star", 0))
+)
+
+// mission 1-5, mission 6 case
+mtc_bricks = [nth_array_object(61), nth_array_object(64)]
+achievement(
+    title = "Too Fast for Me",
+    description = format("Pick the wrong star in the Golden Bar Adventure and hear a voiceover."),
+    points = 0,
+    trigger = pause_lock_hacktice_in_level("Course 2")
+        && any_of(mtc_bricks, o => object_is(o, "mtc brick")
+        && just_changed(object_action(o), 7, 4))
+)
+
+// object invariant
+mtc_red_ground = nth_array_object(32)
+achievement(
+    title = "Don't Need Magic, Only Patience",
+    description = format("Collect the star 'Red Coins of the Lava Lake' in {0} without taking damage or pressing the L button in the lava lake.", course_infos["Course 2"]["full name"]),
+    points = 3,
+    trigger = pause_lock_hacktice_in_level("Course 2")
+        && remained_in_level("Course 2", hit=1)
+        && object_is(mtc_red_ground, "mtc red ground")
+        && object_action(mtc_red_ground) == 1
+        && never(object_action(mtc_red_ground) == 1 && just_took_damage())
+        && never(object_action(mtc_red_ground) == 1 && just_increased(controller_l_button()))
+        && trigger_when(collecting_star_object("spawned star", 0))
+)
+
+mtc_high_secrets = array_map([28, 29, 30, 31], i => nth_array_object(i))
+achievement(
+    title = "Another Acrobatic Flier",
+    description = format("Collect the 4 highest secrets in {0} in one go, without touching the ground or entering a cannon in between.", course_infos["Course 2"]["full name"]),
+    points = 4,
+    trigger = pause_lock_hacktice_in_level("Course 2")
+        && remained_in_level("Course 2", hit=0)
+        && mission__mem == 6
+        // start
+        && tally_of(range(1, 4), 1, a => repeated(1, all_of(mtc_high_secrets, o => object_was(o, "hidden secret") && prev(object_active(o)) != 0) && pos_y() > 1000.0 &&mario_collision_check(object_nth_collided_object(mario_object(), a), "hidden secret", a)))
+        // cancel
+        && never(just_decreased(airborne__mem))
+        && never(mario_action_changed_to("in cannon"))
+        // submit
+        && trigger_when(tally_of(range(1, 4), 4, a => repeated(4, pos_y() > 1000.0 &&mario_collision_check(object_nth_collided_object(mario_object(), a), "hidden secret", a))))
+)
+
+// need koopa cheevs to be object-generic (sub-area scrambles objects :c)
+function object_koopa_race_started_and_won(addr, trig=1) {
+    cond = object_is(addr, "koopa flag checkpoint")
+        && object_koopa_flag_race_started(addr) != 0
+        && prev(object_koopa_flag_race_finished(addr)) == 0
+        && object_koopa_flag_ktq_finished(addr) == 0
+    if (trig > 0)
+        return cond && trigger_when(
+            just_increased(object_koopa_flag_race_finished(addr)))
+    return cond && just_increased(object_koopa_flag_race_finished(addr))
+}
+
+achievement(
+    title = "Way Far Ahead, Too Far Ahead...",
+    description = format("Finish the race with Koopa the Quick in {0} in under 15 seconds.", course_infos["Course 3"]["full name"]),
+    points = 5,
+    trigger = pause_lock_hacktice_in_level("Course 3")
+        && in_area("Course 3", 1)
+        && hud_timer_shown() != 0
+        && hud_timer__mem < int_seconds_to_frames(15)
+        && any_of(array_map(range(0, 239), a => object_koopa_race_started_and_won(nth_array_object(a), trig=1)), b => b)
+)
+
+leaderboard(
+    title = "Koopa's Hopeful Race",
+    description = format("WIN the race with Koopa the Quick in {0}.", course_infos["Course 3"]["full name"]),
+    start = pause_lock_hacktice_in_level("Course 3")
+        && in_area("Course 3", 1) && any_of(array_map(range(0, 239), a => object_koopa_race_started_and_won(nth_array_object(a), trig=0)), b => b),
+    cancel = always_false(),
+    submit = always_true(),
+    value = hud_timer__mem*2,
+    
+    format="FRAMES",
+    lower_is_better = true
+)
+
+leaderboard(
+    title = "Good Sport Race",
+    description = format("Let Koopa the Quick finish the race in {0}. (Talk to Koopa)", course_infos["Course 3"]["full name"]),
+    start = pause_lock_hacktice_in_level("Course 3")
+        && in_area("Course 3", 1) && just_changed(dialog_id__mem, 0x29, 0xFFFF),
+    cancel = always_false(),
+    submit = always_true(),
+    value = hud_timer__mem*2,
+    
+    format="FRAMES",
+    lower_is_better = true
+)
+
+achievement(
+    title = "Desire to Avoid Hot Ground",
+    description = format("Collect the star 'Burning Red Coins Desire' in {0} without getting burned.", course_infos["Course 3"]["full name"]),
+    points = 4,
+    trigger = pause_lock_hacktice_in_level("Course 3")
+        && remained_in_level("Course 3", hit=1)
+        && once(got_one_red)
+        && never(area__mem == 1 && mario_action_changed_to("lava boost"))
+        && trigger_when(collecting_star_object("spawned star", 2))
+)
+
+achievement(
+    title = "Boundary Break",
+    description = format("Collect the star 'Pound Wooden Posts for the Throws!' without pounding any wooden posts.", course_infos["Course 3"]["full name"]),
+    points = 5,
+    trigger = pause_lock_hacktice_in_level("Course 3")
+        && remained_in_level("Course 3", hit=1)
+        && never(ground_pounding_object("wooden post"))
+        && collecting_star_object("regular star", 5)
+)
+
+achievement(
+    title = "Slipping Past the Thwomps",
+    description = format("Collect the star 'Find the Trash Compactor' in {0} while still wearing your vanish cap.", course_infos["Course 4"]["full name"]),
+    points = 5,
+    trigger = pause_lock_hacktice_in_level("Course 4")
+        && in_level("Course 4")
+        && prev(wearing_vanish_cap()) != 0
+        && trigger_when(collecting_star_object("regular star", 1))
+)
+
+achievement(
+    title = "Too Cursed to Ride",
+    description = format("Collect the star 'Frozen Shell Ride' in {0} without riding on any of the Joel's.", course_infos["Course 4"]["full name"]),
+    points = 5,
+    trigger = pause_lock_hacktice_in_level("Course 4")
+        && remained_in_level("Course 4", hit=1)
+        && once(object_changed_to(ridden_object(), "koopa shell"))
+        && never(object_changed_to(stood_on_object(), "hf joel"))
+        && trigger_when(collecting_star_object("regular star", 5))
+)
+
 achievement(
     title = "Not Exactly Out of Place in Space",
     description = "Find a crewmate in Dual Rush (must be on ground).",
     points = 1,
     trigger = pause_lock_hacktice_in_level("Dual Rush")
         && area__mem == 4
-        && camera_focus_z(camera()) < -25200.0
-        && camera_focus_z(camera()) > -26000.0
+        && lakitu_state_goal_focus("z") < -25200.0
+        && lakitu_state_goal_focus("z") > -26000.0
         && airborne__mem == 0
+)
+
+achievement(
+    title = "Switchless Chute",
+    description = format("Collect the star 'Death Shute' in {0} without pressing a purple switch.", course_infos["Course 5"]["full name"]),
+    points = 3,
+    trigger = pause_lock_hacktice_in_level("Course 5")
+        && remained_in_level("Course 5", hit=1)
+        //&& in_3d_box(0.0, 0.0, 0.0, 0.0, 0.0, 0.0)
+        && never(object_is(stood_on_object(), "scut switch") && just_changed(object_action(stood_on_object()), 0, 1))
+        && trigger_when(collecting_star_object("regular star", 3))
+)
+
+achievement(
+    title = "Big Boo Beatdown",
+    description = format("Collect the star 'Villanous Penthouse' in {0} without pressing the purple switches more than once.", course_infos["Course 5"]["full name"]),
+    points = 4,
+    trigger = pause_lock_hacktice_in_level("Course 5")
+        && remained_in_level("Course 5", hit=1)
+        //&& pos_y() > 1000.0
+        && never(repeated(2,object_is(stood_on_object(), "scut switch") && just_changed(object_action(stood_on_object()), 0, 1)))
+        && trigger_when(collecting_star_object("spawned star", 5))
+)
+
+function object_bee_nest_broken(addr) =>
+    object_is(addr, "exclamation box")
+    && object_active(addr) != 0
+    && object_subtype(addr) == 15 // specific to these boxes
+    && just_changed_to(object_action(addr), 3)
+
+// not star specific
+
+spiders_death = nth_array_object(73)
+// should be 9
+spiders_nests = array_map(range(11, 19), a => nth_array_object(a))
+achievement(
+    title = "Hive Extermination",
+    description = format("Destroy all 9 bee nests in {0} in one go without taking damage or falling down.", course_infos["Course 6"]["full name"]),
+    points = 5,
+    trigger = pause_lock_hacktice_in_level("Course 6")
+        && remained_in_level("Course 6", hit=1) // mind water
+        && never(just_increased(hp_decrement()))
+        && never(any_of(burning_actions, a => mario_action_changed_to(a)))
+        && never(object_is(spiders_death, "spiders death") && just_changed(object_action(spiders_death), 0, 1))
+        && (measured(tally(length(spiders_nests), array_map(spiders_nests, a => once(object_bee_nest_broken(a)))), when=in_level("Course 6")))
+            || (tally(1, array_map(spiders_nests, a => once(object_bee_nest_broken(a)))) 
+                && in_level("Course 6") && trigger_when(impossible_condition()))
+)
+
+achievement(
+    title = "Sticky Jump Button",
+    description = format("Collect all 8 red coins in {0} without pressing the A button. (can hold A before entering)", course_infos["Course 6"]["full name"]),
+    points = 5,
+    trigger = pause_lock_hacktice_in_level("Course 6")
+        && remained_in_level("Course 6", hit=1)
+        && never(just_increased(controller_a_button()))
+        && once(got_one_red)
+        && trigger_when(tally(8, got_one_red))
+)
+
+achievement(
+    title = "There Was No Money",
+    description = format("Talk to the secret tarantula hawk in {0}. (hacktice allowed)", course_infos["Course 6"]["full name"]),
+    points = 1,
+    trigger = in_level("Course 6")
+        && just_changed(dialog_id__mem, 0x28, 0xFFFF)
+)
+
+achievement(
+    title = "No Lift Needed, Just Jumps",
+    description = format("Collect the star 'Secrets in the Cargo Room' in {0} without pressing the purple switch.", course_infos["Course 7"]["full name"]),
+    points = 4,
+    trigger = pause_lock_hacktice_in_level("Course 7")
+        && remained_in_level("Course 7", hit=1)
+        && never(object_is(stood_on_object(), "luigiman switch") && just_changed(object_action(stood_on_object()), 0, 1))
+        && tally_of(range(1, 4), 1, a => repeated(1,mario_collision_check(object_nth_collided_object(mario_object(), a), "hidden secret", a)))
+        && trigger_when(collecting_star_object("spawned star", 2))
+)
+
+achievement(
+    title = "Low-Grav Collector",
+    description = format("Collect the star 'Red Coin Planetary Ring' in {0} without falling out of the course.", course_infos["Course 7"]["full name"]),
+    points = 5,
+    trigger = pause_lock_hacktice_in_level("Course 7")
+        && remained_in_level("Course 7", hit=1)
+        && never(death_warp_in_level())
+        && once(got_one_red)
+        && trigger_when(collecting_star_object("spawned star", 1))
+)
+
+achievement(
+    title = "Moving Reds on the Cogs",
+    description = format("Collect all 8 red coins in {0} while in the present time state.", course_infos["Course 8"]["full name"]),
+    points = 5,
+    trigger = pause_lock_hacktice_in_level("Course 8")
+        && remained_in_level("Course 8", hit=1)
+        && never(got_one_red && music_tempo__mem == 0x1750)// music tempo check)
+        && once(got_one_red && music_tempo__mem == 0x1fd4)// music tempo check)
+        && trigger_when(repeated(8, got_one_red && music_tempo__mem == 0x1750)) // music tempo check
+)
+
+gUsedHyper__addr = 0x203025
+
+achievement(
+    title = "Hypercube Destructor",
+    description = format("Destroy all X hypercube blocks in {0}.", course_infos["Course 8"]["full name"]),
+    points = 3,
+    trigger = pause_lock_hacktice_in_level("Course 8")
+        && remained_in_level("Course 8", hit=0)
+        && once(just_changed(bitcount(gUsedHyper__addr), 0, 1))
+        && trigger_when(bitcount(gUsedHyper__addr) == 8)
+)
+
+// side courses
+
+achievement(
+    title = "The Metal Cap Proves Useless Again",
+    description = format("Collect the red coin star in {0} without getting a metal cap.", course_infos["Dice Fortress"]["full name"]),
+    points = 2,
+    trigger = pause_lock_hacktice_in_level("Dice Fortress")
+        && remained_in_level("Dice Fortress", hit=1)
+        && never(just_increased(wearing_metal_cap()))
+        && once(got_one_red)
+        && trigger_when(collecting_star_object("spawned star", 0))
+)
+
+mushie_ctl = nth_array_object(2)
+
+achievement(
+    title = "Predestined Dusty Gravity",
+    description = format("Collect any 4 red coins in {0} without falling out of the course.", course_infos["Predestined Fate"]["full name"]),
+    points = 4,
+    trigger = pause_lock_hacktice_in_level("Predestined Fate")
+        && remained_in_level("Predestined Fate", hit=0)
+        && object_is(mushie_ctl, "mushie ctl")
+        && never(just_changed(object_action(mushie_ctl), 0, 1))
+        && once(got_one_red && prev(g_red_coins_collected__mem) < 5)
+        && (measured(tally(4, got_one_red))) ||
+            (trigger_when(tally(4, got_one_red)))
+)
+
+// lel
+achievement(
+    title = "To the Moon, Again Again",
+    description = format("Fall too high in the first overworld, and hear some fitting music as you game over."),
+    points = 1,
+    trigger = pause_lock_hacktice_in_level("Overworld 1")
+        && repeated(210, music_id__mem == 0x2F)
+        && never(just_changed_from(music_id__mem, 0x2F))
+)
+
+achievement(
+    title = "Inb4 Brodute Patches This Skip",
+    description = format("Collect the star in {0} without sliding.", course_infos["Slide"]["full name"]),
+    points = 5,
+    trigger = pause_lock_hacktice_in_level("Slide")
+        && remained_in_level("Slide", hit=1)
+        && never(any_of(sliding_actions, a => mario_action_changed_to(a)))
+        && trigger_when(collecting_star_object("regular star", 0))
+)
+
+achievement(
+    title = "Staircase Memory",
+    description = format("Collect the star in {0} without pressing the L buton.", course_infos["DNVIC"]["full name"]),
+    points = 3,
+    trigger = pause_lock_hacktice_in_level("DNVIC")
+        && remained_in_level("DNVIC", hit=1)
+        && never(just_increased(controller_l_button()))
+        && trigger_when(collecting_star_object("regular star", 0))
+)
+
+achievement(
+    title = "Unscathed Duo",
+    description = format("Collect both stars in {0} without taking damage or falling out.", course_infos["Dual Rush"]["full name"]),
+    points = 10,
+    trigger = pause_lock_hacktice_in_level("Dual Rush")
+        && remained_in_level("Dual Rush", hit=1)
+        && never(just_increased(hp_decrement()))
+        && never(any_of(burning_actions, a => mario_action_changed_to(a)))
+        && never(just_changed(warp_dest_type(), 0, 3)) // fall out
+        && trigger_when(collecting_star_object("regular star", 0))
+)
+
+achievement(
+    title = "Can't Get Too Far Without the Shell",
+    description = format("Get on top of the first arch after the beginning in {0}.", course_infos["LinCrash"]["full name"]),
+    points = 3,
+    trigger = pause_lock_hacktice_in_level("LinCrash")
+        && in_3d_box(-16000.0, -17000.0, 12000.0, 11300.0, -21000.0, -22000.0)
+)
+
+golf_sphere = nth_array_object(1)
+achievement(
+    title = "Quick Par Shot",
+    description = format("Within 3 seconds of entering the {0}, lock in the right rotation and collect the star.", course_infos["Sphere"]["full name"]),
+    points = 4,
+    trigger = pause_lock_hacktice_in_level("Sphere")
+        && remained_in_level("Sphere", hit=1)
+        && object_is(golf_sphere, "golf sphere")
+        && never(repeated(int_seconds_to_frames(3), object_action(golf_sphere) == 1))
+        && never(just_changed(object_action(golf_sphere), 2, 1))
+        && trigger_when(collecting_star_object("regular star", 0))
+)
+
+achievement(
+    title = "RNG Proof Platforming",
+    description = format("Get to the other side of the castle area in {0} without getting a cap or standing on a cap box. (wait for cap to run out if gotten and return to respawn to try again)", course_infos["Medley"]["full name"]),
+    points = 3,
+    trigger = pause_lock_hacktice_in_level("Medley")
+        && in_area("Medley", 1) && never(screen_changed())
+        && once(pos_z() > 4300.0 && airborne__mem != 0) // in 3d box at start
+        && never(just_increased(wearing_wing_cap()))
+        && never(just_increased(wearing_metal_cap()))
+        && never(just_increased(wearing_vanish_cap()))
+        && never(object_changed_to(stood_on_object(), "exclamation box"))
+        && trigger_when(pos_z() < -1800.0 && airborne__mem != 0) // 3d boxes at end
+)
+
+aglab_fight = nth_array_object(1)
+achievement(
+    title = "Another Boss Battle... Test",
+    description = "Defeat Bowser without taking damage.",
+    points = 10,
+    trigger = pause_lock_hacktice_in_level("Bowser Battle")
+        && remained_in_level("Bowser Battle", hit=1)
+        && object_is(aglab_fight, "aglab fight")
+        && once(just_changed(object_action(aglab_fight), 0, 1))
+        && never(just_took_damage())
+)
+
+gCutsceneDialogID = 0x20e1b8
+
+axo_submit = object_changed_to(object_cutscene(), "spawned star")
+    && object_star_mission(object_cutscene()) == 0
+axo_value = word(gCutsceneDialogID)
+
+achievement(
+    title = "Ace Tracing",
+    description = format("Get at least 90% accuracy in {0}. (cannot check accuracy if star already spawned)", course_infos["Flipnote"]["full name"]),
+    points = 10,
+    trigger = pause_lock_hacktice_in_level("Flipnote")
+        && in_level("Flipnote")
+        && axo_submit
+        && axo_value >= 90
+        && axo_value <= 100
+)
+
+leaderboard(
+    title = "Tracing Champion",
+    description = format("Get the highest accuracy in {0}. (cannot submit if star already spawned)", course_infos["Flipnote"]["full name"]),
+    start = pause_lock_hacktice_in_level("Flipnote")
+        && in_level("Flipnote")
+        && axo_submit,
+    cancel = always_false(),
+    submit = always_true(),
+    value = axo_value,
+    
+    format="VALUE",
+    lower_is_better = false
 )
 
 // blue coins
