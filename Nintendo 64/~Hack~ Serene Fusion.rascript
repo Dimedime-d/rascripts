@@ -866,7 +866,9 @@ achievement(
     title = "Dicey Switcheroo",
     description = "Press the red, green, and blue !-switches.",
     points = 1,
-    trigger = rgb_trigger()
+    trigger = rgb_trigger(),
+    id = 264470,
+    badge = "292387"
 )
 
 // caps / bowsers
@@ -907,15 +909,15 @@ function sum_cannon_bits(offsets) {// cannons always bit7
 //and https://github.com/aglab2/SM64StarDisplay/blob/9d6c11e6af49a4f90a5d8020e8a94fdd611603d0/StarManager/LevelInfo.cs#L25
 course_offsets = {
     //"Course 1":  course_stars_meta(sum_star_bits(0x0f, range(0, 6)), 10, "Tending to the Plants", id=256472, badge="284407"), 
-    "Course 1": course_stars_meta(sum_star_bits(0x0f, range(0, 6)), 10, "Deepblue Depths"),
-    "Course 2": course_stars_meta(sum_star_bits(0x0e, range(0, 6)), 10, "An Actual Treasure Chest"),
-    "Course 3": course_stars_meta(sum_star_bits(0x0d, range(0, 6)), 10, "Makai Field of Hopes and Dreams"),
-    "Course 4": course_stars_meta(sum_star_bits(0x0c, range(0, 6)), 10, "Spooky Machinery"),
-    "Course 5": course_stars_meta(sum_star_bits(0x13, range(0, 6)), 10, "Another Star Adventure"),
-    "Course 6": course_stars_meta(sum_star_bits(0x12, range(0, 6)), 10, "Land of Oversized Arthropods"),
-    "Course 7": course_stars_meta(sum_star_bits(0x11, range(0, 6)), 10, "Spaceman Infiltration"),
-    "Course 8": course_stars_meta(sum_star_bits(0x10, range(0, 6)), 10, "Haven't Aged a Bit"),
-    "Medley": course_stars_meta(sum_star_bits(0x1b, range(0, 6)), 10, "Perilous Procgen"),
+    "Course 1": course_stars_meta(sum_star_bits(0x0f, range(0, 6)), 10, "Deepblue Depths", id=264471, badge="292388"),
+    "Course 2": course_stars_meta(sum_star_bits(0x0e, range(0, 6)), 10, "An Actual Treasure Chest", id=264472, badge="292389"),
+    "Course 3": course_stars_meta(sum_star_bits(0x0d, range(0, 6)), 10, "Makai Field of Hopes and Dreams", id=264473, badge="292390"),
+    "Course 4": course_stars_meta(sum_star_bits(0x0c, range(0, 6)), 10, "Spooky Machinery", id=264474, badge="292391"),
+    "Course 5": course_stars_meta(sum_star_bits(0x13, range(0, 6)), 10, "Another Star Adventure", id=264475, badge="292392"),
+    "Course 6": course_stars_meta(sum_star_bits(0x12, range(0, 6)), 10, "Land of Oversized Arthropods", id=264476, badge="292393"),
+    "Course 7": course_stars_meta(sum_star_bits(0x11, range(0, 6)), 10, "Spaceman Infiltration", id=264477, badge="292394"),
+    "Course 8": course_stars_meta(sum_star_bits(0x10, range(0, 6)), 10, "Haven't Aged a Bit", id=264478, badge="292395"),
+    "Medley": course_stars_meta(sum_star_bits(0x1b, range(0, 6)), 10, "Perilous Procgen", id=264479, badge="292396"),
 }
 
 for c in course_offsets {
@@ -981,7 +983,9 @@ star_collection_achievement(
     stars = secret_stars, total = 17,
     title = "Creators' Concept Challenges",
     description = format("Collect all 17 secret stars, excluding {0}.", course_infos["Medley"]["full name"]),
-    points = 25
+    points = 25,
+    id = 264480,
+    badge = "292397"
 )
 
 // Milestones
@@ -1000,8 +1004,8 @@ function star_milestone_trigger(num_stars) {
 function milestone_meta(title, description, stars, points, id=0, badge="0") => {"title": title, "description": description, "stars": stars, "points": points, "id": id, "badge": badge}
 
 milestones = [
-    milestone_meta("Start of Another aglab Collab", "Collect your first star.", stars=1, points=1),
-    milestone_meta("Redemption of an Abandoned Project", "Collect all 80 stars.", stars=80, points=25)
+    milestone_meta("Start of Another aglab Collab", "Collect your first star.", stars=1, points=1, id=264481, badge="292398"),
+    milestone_meta("Redemption of an Abandoned Project", "Collect all 80 stars.", stars=80, points=25, id=264482, badge="292399")
 ]
 
 for milestone in milestones {
@@ -1022,7 +1026,8 @@ achievement(
     description = "Collect the key in the second overworld for the first time.",
     points = 3,
     trigger = in_level("Overworld 2")
-        && just_increased(bit(4, current_file__addr + 8))
+        && just_increased(bit(4, current_file__addr + 8)),
+    id=264483, badge="292400"
 )
 
 achievement(
@@ -1031,7 +1036,8 @@ achievement(
     points = 10,
     trigger = pause_lock_hacktice_in_level("Bowser Battle")
         && in_level("Bowser Battle")
-        && just_increased(wearing_wing_cap())
+        && just_increased(wearing_wing_cap()),
+    id=264484, badge="292401"
 )
 
 // Misc / Challenges
@@ -1046,7 +1052,8 @@ achievement(
         && object_is(ab_sand, "ab sand")
         && once(just_changed(object_action(ab_sand), 0, 1))
         && never(just_changed(object_action(ab_sand), 1, 2))
-        && trigger_when(collecting_star_object("spawned star", 2))
+        && trigger_when(collecting_star_object("spawned star", 2)),
+    id=264485, badge="292402"
 )
 
 ab_troll = nth_array_object(1)
@@ -1059,7 +1066,8 @@ achievement(
         && object_is(ab_troll, "ab troll")
         && airborne__mem == 0
         && object_distance_to_mario(ab_troll) > 100.0
-        && object_distance_to_mario(ab_troll) < 400.0
+        && object_distance_to_mario(ab_troll) < 400.0,
+    id=264486, badge="292403"
 )
 
 got_one_red = nof_coins() == prev(nof_coins()) + 2
@@ -1073,7 +1081,8 @@ achievement(
         && area__mem == 1
         && once(got_one_red)
         && never(just_increased(swimming__mem))
-        && trigger_when(collecting_star_object("spawned star", 0))
+        && trigger_when(collecting_star_object("spawned star", 0)),
+    id=264487, badge="292404"
 )
 
 // mission 1-5, mission 6 case
@@ -1084,7 +1093,8 @@ achievement(
     points = 0,
     trigger = pause_lock_hacktice_in_level("Course 2")
         && any_of(mtc_bricks, o => object_is(o, "mtc brick")
-        && just_changed(object_action(o), 7, 4))
+        && just_changed(object_action(o), 7, 4)),
+    id=264488, badge="292405"
 )
 
 // object invariant
@@ -1099,7 +1109,8 @@ achievement(
         && object_action(mtc_red_ground) == 1
         && never(object_action(mtc_red_ground) == 1 && just_took_damage())
         && never(object_action(mtc_red_ground) == 1 && just_increased(controller_l_button()))
-        && trigger_when(collecting_star_object("spawned star", 0))
+        && trigger_when(collecting_star_object("spawned star", 0)),
+    id=264489, badge="292406"
 )
 
 mtc_high_secrets = array_map([28, 29, 30, 31], i => nth_array_object(i))
@@ -1116,7 +1127,8 @@ achievement(
         && never(just_decreased(airborne__mem))
         && never(mario_action_changed_to("in cannon"))
         // submit
-        && trigger_when(tally_of(range(1, 4), 4, a => repeated(4, pos_y() > 1000.0 &&mario_collision_check(object_nth_collided_object(mario_object(), a), "hidden secret", a))))
+        && trigger_when(tally_of(range(1, 4), 4, a => repeated(4, pos_y() > 1000.0 &&mario_collision_check(object_nth_collided_object(mario_object(), a), "hidden secret", a)))),
+    id=264490, badge="292407"
 )
 
 // need koopa cheevs to be object-generic (sub-area scrambles objects :c)
@@ -1139,7 +1151,8 @@ achievement(
         && in_area("Course 3", 1)
         && hud_timer_shown() != 0
         && hud_timer__mem < int_seconds_to_frames(15)
-        && any_of(array_map(range(0, 239), a => object_koopa_race_started_and_won(nth_array_object(a), trig=1)), b => b)
+        && any_of(array_map(range(0, 239), a => object_koopa_race_started_and_won(nth_array_object(a), trig=1)), b => b),
+    id=264491, badge="292408"
 )
 
 leaderboard(
@@ -1176,7 +1189,8 @@ achievement(
         && remained_in_level("Course 3", hit=1)
         && once(got_one_red)
         && never(area__mem == 1 && mario_action_changed_to("lava boost"))
-        && trigger_when(collecting_star_object("spawned star", 2))
+        && trigger_when(collecting_star_object("spawned star", 2)),
+    id=264492, badge="292409"
 )
 
 achievement(
@@ -1186,7 +1200,8 @@ achievement(
     trigger = pause_lock_hacktice_in_level("Course 3")
         && remained_in_level("Course 3", hit=1)
         && never(ground_pounding_object("wooden post"))
-        && collecting_star_object("regular star", 5)
+        && collecting_star_object("regular star", 5),
+    id=264493, badge="292410"
 )
 
 achievement(
@@ -1196,7 +1211,8 @@ achievement(
     trigger = pause_lock_hacktice_in_level("Course 4")
         && in_level("Course 4")
         && prev(wearing_vanish_cap()) != 0
-        && trigger_when(collecting_star_object("regular star", 1))
+        && trigger_when(collecting_star_object("regular star", 1)),
+    id=264494, badge="292411"
 )
 
 achievement(
@@ -1207,7 +1223,8 @@ achievement(
         && remained_in_level("Course 4", hit=1)
         && once(object_changed_to(ridden_object(), "koopa shell"))
         && never(object_changed_to(stood_on_object(), "hf joel"))
-        && trigger_when(collecting_star_object("regular star", 5))
+        && trigger_when(collecting_star_object("regular star", 5)),
+    id=264495, badge="292412"
 )
 
 achievement(
@@ -1218,7 +1235,8 @@ achievement(
         && area__mem == 4
         && lakitu_state_goal_focus("z") < -25200.0
         && lakitu_state_goal_focus("z") > -26000.0
-        && airborne__mem == 0
+        && airborne__mem == 0,
+    id=264496, badge="292413"
 )
 
 achievement(
@@ -1229,7 +1247,8 @@ achievement(
         && remained_in_level("Course 5", hit=1)
         //&& in_3d_box(0.0, 0.0, 0.0, 0.0, 0.0, 0.0)
         && never(object_is(stood_on_object(), "scut switch") && just_changed(object_action(stood_on_object()), 0, 1))
-        && trigger_when(collecting_star_object("regular star", 3))
+        && trigger_when(collecting_star_object("regular star", 3)),
+    id=264497, badge="292414"
 )
 
 achievement(
@@ -1240,7 +1259,8 @@ achievement(
         && remained_in_level("Course 5", hit=1)
         //&& pos_y() > 1000.0
         && never(repeated(2,object_is(stood_on_object(), "scut switch") && just_changed(object_action(stood_on_object()), 0, 1)))
-        && trigger_when(collecting_star_object("spawned star", 5))
+        && trigger_when(collecting_star_object("spawned star", 5)),
+    id=264498, badge="292415"
 )
 
 function object_bee_nest_broken(addr) =>
@@ -1265,7 +1285,8 @@ achievement(
         && never(object_is(spiders_death, "spiders death") && just_changed(object_action(spiders_death), 0, 1))
         && ((measured(tally(length(spiders_nests), array_map(spiders_nests, a => once(object_bee_nest_broken(a)))), when=in_level("Course 6")))
             || (tally(1, array_map(spiders_nests, a => once(object_bee_nest_broken(a)))) 
-                && in_level("Course 6") && trigger_when(impossible_condition())))
+                && in_level("Course 6") && trigger_when(impossible_condition()))),
+    id=264499, badge="292416"
 )
 
 achievement(
@@ -1276,7 +1297,8 @@ achievement(
         && remained_in_level("Course 6", hit=1)
         && never(warp_dest_type() == 0 && just_increased(controller_a_button()))
         && once(got_one_red)
-        && trigger_when(tally(8, got_one_red))
+        && trigger_when(tally(8, got_one_red)),
+    id=264500, badge="292417"
 )
 
 achievement(
@@ -1284,7 +1306,8 @@ achievement(
     description = format("Talk to the secret tarantula hawk in {0}. (hacktice allowed)", course_infos["Course 6"]["full name"]),
     points = 1,
     trigger = in_level("Course 6")
-        && just_changed(dialog_id__mem, 0x28, 0xFFFF)
+        && just_changed(dialog_id__mem, 0x28, 0xFFFF),
+    id=264501, badge="292418"
 )
 
 achievement(
@@ -1295,7 +1318,8 @@ achievement(
         && remained_in_level("Course 7", hit=1)
         && never(object_changed_to(stood_on_object(), "luigiman platform"))
         && tally_of(range(1, 4), 1, a => repeated(1,mario_collision_check(object_nth_collided_object(mario_object(), a), "hidden secret", a)))
-        && trigger_when(collecting_star_object("spawned star", 2))
+        && trigger_when(collecting_star_object("spawned star", 2)),
+    id=264502, badge="292419"
 )
 
 achievement(
@@ -1306,7 +1330,8 @@ achievement(
         && remained_in_level("Course 7", hit=1)
         && never(mario_action_changed_to("falling death exit"))
         && once(got_one_red)
-        && trigger_when(collecting_star_object("spawned star", 1))
+        && trigger_when(collecting_star_object("spawned star", 1)),
+    id=264503, badge="292420"
 )
 
 achievement(
@@ -1317,7 +1342,8 @@ achievement(
         && remained_in_level("Course 8", hit=1)
         && never(just_changed_to(music_tempo__mem, 0x1750))
         //&& once(got_one_red && music_tempo__mem == 0x1df4)// music tempo check)
-        && trigger_when(collecting_star_object("spawned star", 3))
+        && trigger_when(collecting_star_object("spawned star", 3)),
+    id=264504, badge="292421"
 )
 
 gUsedHyper__addr = 0x203025
@@ -1330,7 +1356,8 @@ achievement(
     trigger = pause_lock_hacktice_in_level("Course 8")
         && remained_in_level("Course 8", hit=0)
         && once(just_changed(bitcount(gUsedHyper__addr), 0, 1))
-        && (measured(sum_of(range(0, 7), a => bit(a, gUsedHyper__addr)/bit(a, gUsedHyper__addr)) == 8, when=in_level("Course 8")) || trigger_when(bitcount(gUsedHyper__addr) == 8))
+        && (measured(sum_of(range(0, 7), a => bit(a, gUsedHyper__addr)/bit(a, gUsedHyper__addr)) == 8, when=in_level("Course 8")) || trigger_when(bitcount(gUsedHyper__addr) == 8)),
+    id=264505, badge="292422"
 )
 
 // side courses
@@ -1343,7 +1370,8 @@ achievement(
         && remained_in_level("Dice Fortress", hit=1)
         && never(just_increased(wearing_metal_cap()))
         && once(got_one_red)
-        && trigger_when(collecting_star_object("spawned star", 0))
+        && trigger_when(collecting_star_object("spawned star", 0)),
+    id=264506, badge="292423"
 )
 
 mushie_ctl = nth_array_object(2)
@@ -1357,7 +1385,8 @@ achievement(
         && object_is(mushie_ctl, "mushie ctl")
         && never(just_changed(object_action(mushie_ctl), 0, 1))
         && ((measured(tally(4, got_one_red))) ||
-            (once(got_one_red && prev(g_red_coins_collected__mem) < 5) && trigger_when(tally(4, got_one_red))))
+            (once(got_one_red && prev(g_red_coins_collected__mem) < 5) && trigger_when(tally(4, got_one_red)))),
+    id=264507, badge="292424"
 )
 
 // lel
@@ -1367,7 +1396,8 @@ achievement(
     points = 1,
     trigger = pause_lock_hacktice_in_level("Overworld 1")
         && repeated(180, music_id__mem == 0x2F)
-        && never(just_changed_from(music_id__mem, 0x2F))
+        && never(just_changed_from(music_id__mem, 0x2F)),
+    id=264508, badge="292425"
 )
 
 achievement(
@@ -1377,7 +1407,8 @@ achievement(
     trigger = pause_lock_hacktice_in_level("Slide")
         && remained_in_level("Slide", hit=1)
         && never(mario_action_changed_to("butt slide"))
-        && trigger_when(collecting_star_object("regular star", 0))
+        && trigger_when(collecting_star_object("regular star", 0)),
+    id=264509, badge="292426"
 )
 
 achievement(
@@ -1387,7 +1418,8 @@ achievement(
     trigger = pause_lock_hacktice_in_level("DNVIC")
         && remained_in_level("DNVIC", hit=1)
         && never(just_increased(controller_l_button()))
-        && trigger_when(collecting_star_object("regular star", 0))
+        && trigger_when(collecting_star_object("regular star", 0)),
+    id=264510, badge="292427"
 )
 
 achievement(
@@ -1399,7 +1431,8 @@ achievement(
         && never(just_increased(hp_decrement()))
         && never(any_of(burning_actions, a => mario_action_changed_to(a)))
         && never(just_changed(warp_dest_type(), 0, 3)) // fall out
-        && trigger_when(collecting_star_object("regular star", 0))
+        && trigger_when(collecting_star_object("regular star", 0)),
+    id=264511, badge="292428"
 )
 
 achievement(
@@ -1408,7 +1441,8 @@ achievement(
     points = 3,
     trigger = pause_lock_hacktice_in_level("LinCrash")
         && in_level("LinCrash")
-        && in_3d_box(-16000.0, -17000.0, 12000.0, 11300.0, -21000.0, -22000.0)
+        && in_3d_box(-16000.0, -17000.0, 12000.0, 11300.0, -21000.0, -22000.0),
+    id=264512, badge="292429"
 )
 
 golf_sphere = nth_array_object(1)
@@ -1421,7 +1455,8 @@ achievement(
         && object_is(golf_sphere, "golf sphere")
         && never(repeated(int_seconds_to_frames(3)*2, object_action(golf_sphere) == 1))
         && never(just_changed(object_action(golf_sphere), 2, 1))
-        && trigger_when(collecting_star_object("regular star", 0))
+        && trigger_when(collecting_star_object("regular star", 0)),
+    id=264513, badge="292430"
 )
 
 dan_bp = nth_array_object(2)
@@ -1432,7 +1467,8 @@ achievement(
     trigger = pause_lock_hacktice_in_level("GPTV")
         && in_level("GPTV")
         && object_is(dan_bp, "dan banana")
-        && just_changed(object_action(dan_bp), 1, 50)
+        && just_changed(object_action(dan_bp), 1, 50),
+    id=264514, badge="292431"
 )
 
 achievement(
@@ -1446,7 +1482,8 @@ achievement(
         && never(just_increased(wearing_metal_cap()))
         && never(just_increased(wearing_vanish_cap()))
         && never(object_changed_to(stood_on_object(), "exclamation box"))
-        && trigger_when(pos_z() < -1800.0) // 3d boxes at end
+        && trigger_when(pos_z() < -1800.0),
+    id=264515, badge="292432"
 )
 
 // funny lb
@@ -1471,7 +1508,8 @@ achievement(
         && object_is(aglab_fight, "aglab fight")
         && once(just_changed(object_action(aglab_fight), 0, 1))
         && never(just_took_damage())
-        && trigger_when(just_changed(object_action(aglab_fight), 8, 9))
+        && trigger_when(just_changed(object_action(aglab_fight), 8, 9)),
+    id=264516, badge="292433"
 )
 
 gCutsceneDialogID = 0x20e1b8
@@ -1488,7 +1526,8 @@ achievement(
         && in_level("Flipnote")
         && axo_submit
         && axo_value >= 90
-        && axo_value <= 100
+        && axo_value <= 100,
+    id=264517, badge="292434"
 )
 
 leaderboard(
@@ -1506,17 +1545,17 @@ leaderboard(
 )
 
 // blue coins
-function blue_coin_meta(title, level, points, coin_count) => {"title": title, "level": level, "points": points, "count": coin_count}
+function blue_coin_meta(title, level, points, coin_count, id=0, badge="") => {"title": title, "level": level, "points": points, "count": coin_count, "id":id, "badge":badge}
 
 blue_coins = [
-    blue_coin_meta("Azure Coins",               "Course 1", 3, 7),
-    blue_coin_meta("Molten Treasures",          "Course 2", 4, 6),
-    blue_coin_meta("Blue Cards, I Mean Coins",  "Course 3", 2, 7),
-    blue_coin_meta("Haunted Blues",             "Course 4", 3, 11),
-    blue_coin_meta("Double the Switches, Half the Effort",     "Course 5", 2, 6),
-    blue_coin_meta("Tricky Sticky Coins",              "Course 6",10, 8),
-    blue_coin_meta("Space Currency",            "Course 7", 3, 5),
-    blue_coin_meta("A Timer 40 Years Back",     "Course 8", 5, 10),
+    blue_coin_meta("Azure Coins",               "Course 1", 3, 7, id=264518, badge="292435"),
+    blue_coin_meta("Molten Treasures",          "Course 2", 4, 6, id=264519, badge="292436"),
+    blue_coin_meta("Blue Cards, I Mean Coins",  "Course 3", 2, 7, id=264520, badge="292437"),
+    blue_coin_meta("Haunted Blues",             "Course 4", 3, 11, id=264521, badge="292438"),
+    blue_coin_meta("Double the Switches, Half the Effort",     "Course 5", 2, 6, id=264522, badge="292439"),
+    blue_coin_meta("Tricky Sticky Coins",              "Course 6",10, 8, id=264523, badge="292440"),
+    blue_coin_meta("Space Currency",            "Course 7", 3, 5, id=264524, badge="292441"),
+    blue_coin_meta("A Timer 40 Years Back",     "Course 8", 5, 10, id=264525, badge="292442"),
 ]
 
 for bc in blue_coins {
@@ -1526,7 +1565,9 @@ for bc in blue_coins {
         points = bc["points"],
         trigger = pause_lock_hacktice_in_level(bc["level"])
             && remained_in_level(bc["level"], hit=0)
-            && measured(tally_of(range(1, 4), bc["count"], a => repeated(bc["count"] ,mario_collision_check(object_nth_collided_object(mario_object(), a), "blue coin for block", a))), when=in_level(bc["level"]))
+            && measured(tally_of(range(1, 4), bc["count"], a => repeated(bc["count"] ,mario_collision_check(object_nth_collided_object(mario_object(), a), "blue coin for block", a))), when=in_level(bc["level"])),
+        id = bc["id"],
+        badge = bc["badge"]
     )
 }
 
