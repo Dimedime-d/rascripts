@@ -66,15 +66,44 @@ class_ptrs = {
 
 unit_ptrs = {
     "Blank":        0x00000000,
+    "Void":         0x08803D64, // Lv. 1 Void Lord
+    "Tim":          0x08803D98, // Lv. 1 Fighter
+    "Tam":          0x08803DCC, // Lv. 1 Fighter
+    "Jerome":       0x08803E00, // Lv. 1 Soldier
+    "Leeroy":       0x08803E34, // Lv. 1 Paladin
+    "Myrmidon Anna":0x08803E68, // Lv. 2 Myrmidon
+    "Bede":         0x08803E9C, // Lv. 1 Priest
+    "Jay":          0x08803ED0, // Lv. 5 Archer
+    "Not Arch":     0x08803F04, // Lv. 5 Mage
+    "Kirsten":      0x08803F38, // Lv. 5 Peg Knight
+    "Bob":          0x08803F6C, // Lv. 3 Thief
+    "Roshea":       0x08803FA0, // Lv. 8 Cavalier
+    "Prine":        0x08803FD4, // Lv. 10 Troubador
+    "Edge":         0x08804008, // Lv. 7 Mercenary
+    // no Ephraim
+    "Samson":       0x08804070, // Lv. 1 Sniper
+    "Arve":         0x088040A4, // Lv. 10 Shaman
+    "Tye":          0x088040D8, // Lv. 10 Armor Knight
+    "Celicia":      0x0880410C, // Lv. 5 Mage Knight
+    "Eevster":      0x08804140, // Lv. 18 Troubador
+    "Wyvern Anna":  0x08804174, // Lv. 15 Wyvern Rider
+    "Nikita":       0x088041A8, // Lv. 12 Great Knight
+    "Rouge Anna":   0x088041DC, // Lv. 5 Rouge
+    "Edgeworth":    0x08804210, // Lv. 20 Citizen
+    "Ziguldo":      0x08804244, // Lv. 10 Paladin
+    "Kaga":         0x08804278, // Lv. 12 Dancer
+    "Doot":         0x088042AC, // Lv. 3 Mage
+    "Celica":       0x088042E0, // Lv. 12 Bishop
+    "Doowile":      0x08804314, // Lv. 4 Entombed
+    "Evil Florina": 0x08804348, // tfw your name is so long, it breaks the deployment menu, Lv. 13 Shaman
+    "Bjorn":        0x0880437C, // Lv. 10 Druid
+    "Jake":         0x088043B0, // Lv. 10 Mage Knight
+    "Marf":         0x088043E4, // Lv. 20 Swordmaster
+    "Tiki":         0x08804418, // Lv. 20 Manakete
+    //no Lyon
+    "Mark":         0x08804480, // Lv. 20 Manakete
     
-    "Myrmidon Anna":0x08803E68,
-    "Nikita":       0x088041A8,
-    "Doot":         0x088042AC,
-    "Evil Florina": 0x08804348, // tfw your name is so long, it breaks the deployment menu
-    "Bjorn":        0x0880437C,
-    "Marf":         0x088043E4,
-    
-    "Feditor":      0x088063C8,
+    "Feditor":      0x088063C8, // DK
 }
 
 function unit_exists(addr) => unit_character(addr) != 0
@@ -176,6 +205,9 @@ battle_target_unit__addr = 0x4256c
 
 function battle_actor_unit_is(name) => unit_is(battle_actor_unit__addr, name)
 function battle_target_unit_is(name) => unit_is(battle_target_unit__addr, name)
+function attacker_or_defender_is(name) => __ornext(battle_actor_unit_is(name) || battle_target_unit_is(name))
+function battle_actor_class_is(name) => unit_class_is(battle_actor_unit__addr, name)
+function battle_target_class_is(name) => unit_class_is(battle_target_unit__addr, name)
 
 unit_array = {
     "player":   0x33e4c,
@@ -251,8 +283,10 @@ function protected_achievement(title, description, points, trigger, id=0, badge=
 //   p r o c s   //
 // ------------- //
 
+//https://www.dropbox.com/sh/zymc1h221nnxpm9/AABfRs08USpstLoTqd03_Cl3a/Stan/_Notes/6CNotes?dl=0&preview=6CNotes.txt&subfolder_nav_tracking=1
 proc__struct = {
     "code start pointer":   0x00,   // dword (points to ROM, use as proc identifier)
+    "loop routine":         0x0C,   // dword, called instead of code when not null
     "first child proc":     0x18,   // dword (pointer to proc)
     "next proc":            0x20,   // dword (pointer to proc)
 }
@@ -260,6 +294,8 @@ proc__struct = {
 function proc_field(base, field) => struct_field(proc__struct, base, field)
 
 function proc_is(addr, name) => dword(proc_field(addr, "code start pointer")) == proc_defs[name]
+
+function proc_loop_is(addr, name) => dword(proc_field(addr, "loop routine")) == popup_proc_asm_defs[name]
 
 function proc_first_child_ptr(addr) => tbyte(proc_field(addr, "first child proc")) + ewram_offset
 function proc_next_proc(addr) => tbyte(proc_field(addr, "next proc")) + ewram_offset
@@ -285,6 +321,12 @@ proc_defs = {
 popup_proc_defs = {
     "SkillLearned":         0x08B5A058, // skill system
     "WeaponBroke":          0x08592420,
+}
+
+// loop routines
+popup_proc_asm_defs = {
+    "skill learned":        0x08B59E2D, // these are timings which wait 60 frames for popup to disappear
+    "weapon level up":      0x08076113,
 }
 
 main_proc_array__mem = 0x2ea70
@@ -328,6 +370,8 @@ item_icon_values = { // Not the same as item IDs, and doesn't work with gold.
 }
 
 function popup_proc_def(addr) => dword(addr + 0x2c)
+function popup_proc_battle_timer(addr) => word(addr + 0x2c)
+function popup_proc_battle_time_to_disappear(addr) => word(addr + 0x2e)
 function popup_proc_is(addr, def_name) => popup_proc_def(addr) == popup_proc_defs[def_name]
 function popup_proc_icon_id(addr) => byte(addr + 0x3e)
 function popup_proc_item_icon_is(addr, icon_name) => popup_proc_icon_id(addr) == item_icon_values[icon_name]
@@ -338,94 +382,101 @@ SFX_PLAYER_ITEM_GET = 0x5A // Player unit item GET. Enemy/NPC units use the "wea
 
 // Battle proc
 // is at a static location (0x28140)
-battle_popup_proc__addr = tbyte(0x20140 + ewram_offset) + ewram_offset 
+battle_popup_proc__ptr = tbyte(0x20140 + ewram_offset)
+battle_popup_proc__addr = battle_popup_proc__ptr + ewram_offset 
 function battle_popup_proc_skill_learned(addr) => word(addr + 0x4e)
 
 // Fortunately, none of these skills should be duplicated across different level up sets (ex: Live to Serve is only ever acquired at lv 10 unpromoted, no other levels)
+function skill_meta(id, names) => {"id": id, "names": names}
+
 level_10_unpromoted_skills = {
-    "Aether":           16, // Ephraim Lord (also Void's personal skill)
-    "Rightful King":    128,// Eirika Lord (Void)
-    "Elbow Room":       99, // Cavalier
-    "Natural Cover":    100,// Armor Knight
-    "Acrobat":          1,  // Thief
-    "Spur Speed":       60, // Mercenary
-    "Vantage":          32, // Myrmidon
-    "Sure Shot":        5,  // Archer
-    "Tantivy":          91, // Wyvern Rider
-    "Adept":            10, // Mage
-    "Spur Defense":     61, // Shaman/Manakete, the latter of which is already leveled past 10
-    "Desperation":      33, // Fighter
-    "Intimidate":       84, // Brigand
-    "Seal Skill":       102,// Pirate
-    "Seal Resistance":  106,// Monk
-    "Live To Serve":    79, // Priest/Cleric
-    "Rally Speed":      71, // Peg Knight
-    "Voice of Peace":   56, // Troubador
-    "Rally Strength":   68, // Soldier
+    //"Aether":           16, // Ephraim Lord (also Void's personal skill)
+    "Rightful King":    skill_meta(128, ["Void"]),// Eirika Lord (Void)
+    "Elbow Room":       skill_meta(99, ["Roshea"]), // Cavalier
+    //"Natural Cover":    skill_meta(100, ["Tye"]), // Armor Knight (he's already Lv. 10)
+    "Acrobat":          skill_meta(1, ["Bob"]),  // Thief
+    "Spur Speed":       skill_meta(60, ["Edge"]), // Mercenary
+    "Vantage":          skill_meta(32, ["Myrmidon Anna"]), // Myrmidon
+    "Sure Shot":        skill_meta(5, ["Jay"]), // Archer
+    "Tantivy":          skill_meta(91, ["Wyvern Anna"]), // Wyvern Rider
+    "Adept":            skill_meta(10, ["Not Arch", "Doot"]), // Mage
+    //"Spur Defense":     skill_meta(61, ["Arve"]),// Shaman/Manakete, both of which are already leveled past 10
+    "Desperation":      skill_meta(33, ["Tim", "Tam"]), // Fighter
+    //"Intimidate":       skill_meta(84, // Brigand
+    //"Seal Skill":       skill_meta(102,// Pirate no recruitables :c
+    //"Seal Resistance":  skill_meta(106,// Monk
+    "Live To Serve":    skill_meta(79, ["Bede"]), // Priest/Cleric
+    "Rally Speed":      skill_meta(71, ["Kirsten"]), // Peg Knight
+    // "Voice of Peace":   skill_meta(56, // Troubador, Prine/Eevester are leveled past
+    "Rally Strength":   skill_meta(68, ["Jerome"]), // Soldier
 }
 
 // (And level 10 promoted, considering Paragon)
 level_5_promoted_skills = {
-    "Rally Spectrum":   76, // Ephraim Great Lord
-    "Nihil":            63, // Eirika Great Lord
-    "Rally Skill":      70, // Paladin
-    "Wary Fighter":     4,  // General
-    "Sol":              15, // Hero
-    "Astra":            17, // Swordmaster
-    "Lifetaker":        47, // Assassin
-    "Bowfaire":         41, // Sniper
-    "Canto Plus":       3,  // Ranger
-    "Savage Blow":      89, // Wyvern Lord / Entomed
-    "Rally Movement":   75, // Wyvern Knight
-    "Tomefaire":        42, // Sage, also Lv. 15 Necromancer, but that class is unobtainable
-    "Rally Resistance": 74, // Mage Knight
-    "Spur Resistance":  62, // Valkyrie / Bishop
-    "Frenzy":           9,  // Druid
-    "Anathema":         94, // Summoner
-    "Lunge":            83, // Rogue
-    "Luna":             14, // Great Knight
-    "Death Blow":       27, // Warrior
-    "Wrath":            34, // Berserker
-    "Savior":           7,  // Falcoknight
-    "Amaterasu":        57, // Dancer
-    "Paragon":          65, // Super Trainees at Level 10, gonna count Paragon for Lv. 5 promoted
+    //"Rally Spectrum":   76, // Ephraim Great Lord
+    "Nihil":            skill_meta(63, ["Void"]),// Eirika Great Lord
+    "Rally Skill":      skill_meta(70, ["Leeroy", "Roshea"]),// Paladin
+    "Wary Fighter":     skill_meta(4,  ["Tye"]),// General
+    "Sol":              skill_meta(15, ["Tim", "Tam", "Edge"]),// Hero
+    "Astra":            skill_meta(17, ["Myrmidon Anna"]),// Swordmaster
+    "Lifetaker":        skill_meta(47, ["Myrmidon Anna", "Bob"]),// Assassin
+    "Bowfaire":         skill_meta(41, ["Jay", "Samson"]),// Sniper
+    "Canto Plus":       skill_meta(3,  ["Jay", "Edge"]),// Ranger
+    "Savage Blow":      skill_meta(89, ["Wyvern Anna", "Doowile"]),// Wyvern Lord / Entomed
+    "Rally Movement":   skill_meta(75, ["Kirsten", "Wyvern Anna"]),// Wyvern Knight
+    "Tomefaire":        skill_meta(42, ["Bede", "Not Arch", "Doot"]),// Sage, also Lv. 15 Necromancer, but that class is unobtainable
+    "Rally Resistance": skill_meta(74, ["Not Arch", "Prine", "Eevster", "Doot"]),// Mage Knight
+    "Spur Resistance":  skill_meta(62, ["Bede", "Prine", "Eevster"]),// Valkyrie / Bishop
+    "Frenzy":           skill_meta(9,  ["Arve", "Evil Florina"]),// Druid
+    "Anathema":         skill_meta(94, ["Arve", "Evil Florina"]),// Summoner
+    "Lunge":            skill_meta(83, ["Bob"]),// Rogue
+    "Luna":             skill_meta(14, ["Tye", "Roshea"]),// Great Knight
+    "Death Blow":       skill_meta(27, ["Tim", "Tam"]), // Warrior
+    //"Wrath":            skill_meta(34, // Berserker
+    "Savior":           skill_meta(7,  ["Kirsten"]), // Falcoknight
+    "Amaterasu":        skill_meta(57, ["Kaga"]), // Dancer
+    "Paragon":          skill_meta(65, ["Jerome"]), // Super Trainees at Level 10, gonna count Paragon for Lv. 5 promoted
 }
 
 level_15_promoted_skills = {
-    "Axebreaker":       21, // Ephraim Great Lord / Hero
-    "Lancebreaker":     20, // Eirika Great Lord
-    "Aegis":            24, // Paladin
-    "Pavise":           25, // General
-    "Swordfaire":       38, // Swordmaster
-    "Pass":             2,  // Assassin
-    "Galeforce":        48, // Sniper
-    "Bowbreaker":       22, // Ranger
-    "Swordbreaker":     19, // Wyvern Lord
-    "Lancefaire":       39, // Wyvern Knight
-    "Ignis":            80, // Sage
-    "Quick Burn":       133,// Mage Knight
-    "Counter Magic":    36, // Bishop
-    "Tomebreaker":      23, // Druid
-    "Renewal":          49, // Summoner
-    "Celerity":         97, // Rouge / Dancer
-    "Armored Blow":     31, // Great Knight
-    "Counter":          35, // Warrior
-    "Axefaire":         40, // Berserker
-    "Warding Blow":     29, // Falcoknight
-    "Charm":            55, // Valkyrie
-    "Colossus":         67, // Entombed
+    "Axebreaker":       skill_meta(21, ["Tim", "Tam", "Edge"]), // Ephraim Great Lord / Hero
+    "Lancebreaker":     skill_meta(20, ["Void"]), // Eirika Great Lord
+    "Aegis":            skill_meta(24, ["Leeroy", "Roshea", "Ziguldo"]), // Paladin
+    "Pavise":           skill_meta(25, ["Tye"]), // General
+    "Swordfaire":       skill_meta(38, ["Myrmidon Anna"]), // Swordmaster
+    "Pass":             skill_meta(2,  ["Myrmidon Anna", "Bob"]), // Assassin
+    "Galeforce":        skill_meta(48, ["Jay", "Samson"]), // Sniper
+    "Bowbreaker":       skill_meta(22, ["Jay", "Edge"]), // Ranger
+    "Swordbreaker":     skill_meta(19, ["Wyvern Anna"]), // Wyvern Lord
+    "Lancefaire":       skill_meta(39, ["Kirsten", "Wyvern Anna"]), // Wyvern Knight
+    "Ignis":            skill_meta(80, ["Bede", "Not Arch", "Doot"]), // Sage
+    "Quick Burn":       skill_meta(133, ["Not Arch", "Prine", "Eevster", "Celicia", "Doot", "Jake"]),// Mage Knight
+    "Counter Magic":    skill_meta(36, ["Bede", "Celica"]), // Bishop
+    "Tomebreaker":      skill_meta(23, ["Arve", "Evil Florina", "Bjorn"]),// Druid
+    "Renewal":          skill_meta(49, ["Arve", "Evil Florina"]),// Summoner
+    "Celerity":         skill_meta(97, ["Bob", "Rouge Anna", "Kaga"]),// Rouge / Dancer
+    "Armored Blow":     skill_meta(31, ["Tye", "Roshea", "Nikita"]),// Great Knight
+    "Counter":          skill_meta(35, ["Tim", "Tam"]),// Warrior
+    //"Axefaire":         skill_meta(40, // Berserker
+    "Warding Blow":     skill_meta(29, ["Kirsten"]),// Falcoknight
+    "Charm":            skill_meta(55, ["Prine", "Eevster"]),// Valkyrie
+    "Colossus":         skill_meta(67, ["Doowile"]), // Entombed
 }
 
 
 function skill_cheevo(title, level_criteria, points, skill_list, id=0, badge="0") {
     battle_anims_on_trig = 
+        battle_popup_proc__ptr != 0 &&
         any_of(skill_list, skill => proc_is(battle_popup_proc__addr, "BattlePopup")
-            && battle_popup_proc_skill_learned(battle_popup_proc__addr) == skill_list[skill])
+            && battle_popup_proc_skill_learned(battle_popup_proc__addr) == skill_list[skill]["id"]
+            && any_of(skill_list[skill]["names"], name => attacker_or_defender_is(name)))
+        && proc_loop_is(battle_popup_proc__addr, "skill learned")
     battle_anims_off_popup = proc_first_child_ptr(main_proc_ptr(3))
     battle_anims_off_trig = 
         any_of(skill_list, skill => proc_is(battle_anims_off_popup, "Popup")
             && popup_proc_is(battle_anims_off_popup, "SkillLearned")
-            && popup_proc_icon_id(battle_anims_off_popup) == skill_list[skill])
+            && popup_proc_icon_id(battle_anims_off_popup) == skill_list[skill]["id"]
+            && any_of(skill_list[skill]["names"], name => attacker_or_defender_is(name)))
     
     protected_achievement(
         title=title,
