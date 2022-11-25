@@ -826,8 +826,6 @@ function in_area(name, area=-1) {
 
 function in_same_level_from_last_frame() => level_id__mem == prev(level_id__mem) && area__mem == prev(area__mem)
 
-//function entered_level_from_star_select(name) => in_level(name) && just_changed_from(music_id__mem, 0x0D) // careful, specific to this hack (AMA)
-
 function level_changed(except_when_entering="") {
     cond = just_changed_any(level_id__mem)
     if (except_when_entering != "")
