@@ -1429,6 +1429,7 @@ achievement(
         && never(just_increased(hp_decrement()))
         && never(any_of(burning_actions, a => mario_action_changed_to(a)))
         && never(just_changed(warp_dest_type(), 0, 3)) // fall out
+        && unless(in_area("Dual Rush", 1) && warp_dest_node() == 0x31 && warp_dest_type() != 0)
         && trigger_when(collecting_star_object("regular star", 0)),
     id=264511, badge="292428"
 )
