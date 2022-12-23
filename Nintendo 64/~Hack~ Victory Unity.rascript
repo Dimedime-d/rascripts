@@ -643,8 +643,8 @@ function course_meta(value, sublevel_value, bit_file_offset, bit, full_name, tit
 
 // https://github.com/n64decomp/sm64/blob/master/levels/level_defines.h level id's
 course_infos = {
-    "KBR2 OW1 Pluto":   course_meta(0x09, 0x01, 0x0F, 0, "the first overworld of King Boo's Revenge 2 requested by PlutoTheThing", "Wood Climbing", 1, 274344, "303456"),
-    "KBR2 OW1 Morning": course_meta(0x09, 0x02, 0x0F, 1, "the first overworld of King Boo's Revenge 2 requested by MorningStorm", "8-Fold Wall Hugging Move", 4, 274343, "303455"),
+    "KBR2 OW1 Pluto":   course_meta(0x09, 0x01, 0x0F, 0, "the first overworld of King Boo's Revenge 2 requested by PlutoTheThing", "Wood Climbing", 2, 274344, "303456"),
+    "KBR2 OW1 Morning": course_meta(0x09, 0x02, 0x0F, 1, "the first overworld of King Boo's Revenge 2 requested by MorningStorm", "8-Fold Wall Hugging Move", 5, 274343, "303455"),
     "KBR2 OW1 Iwer":    course_meta(0x09, 0x03, 0x0F, 2, "the first overworld of King Boo's Revenge 2 requested by Iwer Sonsch", "Healthy Environment", 3, 274342, "303454"),
     "KBR2 OW2":    course_meta(0x09, 0x04, 0x0F, 3, "the second overworld of King Boo's Revenge 2", "Invaders!", 3, 274345, "303457"),
     
@@ -658,10 +658,10 @@ course_infos = {
     "LLT OW":           course_meta(0x04, 0x01, 0x13, 0, "the overworld of Lost Lunatic Trials", "Across the Big Wall", 3, 274349, "303461"),
     
     "MNE OW1 ARP":      course_meta(0x07, 0x01, 0x12, 0, "the first overworld of Mario's New Earth requested by A Random Player", "Jealous Caesar!", 3, 274352, "303464"),
-    "MNE OW1 Hokk":     course_meta(0x07, 0x02, 0x12, 1, "the first overworld of Mario's New Earth requested by The Hokkanen", "Don't Be a Pushover Here!", 1, 274353, "303465"),
+    "MNE OW1 Hokk":     course_meta(0x07, 0x02, 0x12, 1, "the first overworld of Mario's New Earth requested by The Hokkanen", "Don't Be a Pushover Here!", 2, 274353, "303465"),
     "OoT Fort":         course_meta(0x07, 0x03, 0x12, 2, "Gerudo Fortress", "Cherry Coins of Panic", 10, 274359, "303471"),
-    "OoT Temple":       course_meta(0x07, 0x04, 0x12, 3, "the Temple of Time", "Secret Above a Secret", 2, 274361, "303473"),
-    "OoT Kakariko":     course_meta(0x07, 0x05, 0x12, 4, "the Kakariko Village and Graveyard", "Red Evils Over the Ruin", 5, 274360, "303472"),
+    "OoT Temple":       course_meta(0x07, 0x04, 0x12, 3, "the Temple of Time", "Secret Above a Secret", 3, 274361, "303473"),
+    "OoT Kakariko":     course_meta(0x07, 0x05, 0x12, 4, "the Kakariko Village and Graveyard", "Red Evils Over the Ruin", 10, 274360, "303472"),
     "OoT Valley":       course_meta(0x07, 0x06, 0x12, 5, "Gerudo Valley", "Should You Believe in Everything?", 4, 274362, "303474"),
     "OoT Well":         course_meta(0x07, 0x07, 0x12, 6, "the Bottom of the Well", "Fear of the Dark", 2, 274363, "303475"),
     
@@ -693,7 +693,7 @@ course_infos = {
     
     "TTM OW2":          course_meta(0x0D, 0x01, 0x1B, 0, "the second overworld of Star Revenge 2: Act 1 - To the Moon", "Planetary Plight", 3, 274398, "303510"),
     
-    "VA OW1":           course_meta(0x0E, 0x01, 0x1A, 0, "the first overworld of Victory Ascent", "Cash That Star, How 'Bout That?", 4, 274408, "303520"),
+    "VA OW1":           course_meta(0x0E, 0x01, 0x1A, 0, "the first overworld of Victory Ascent", "Cash That Star, How 'Bout That?", 5, 274408, "303520"),
     "SR5.5 OW Angry":   course_meta(0x0E, 0x02, 0x1A, 1, "the main overworld of Star Revenge 5.5 requested by Angry", "Narrow Paths of Fools", 5, 274384, "303496"),
     "SR5.5 OW Lily":    course_meta(0x0E, 0x03, 0x1A, 2, "the main overworld of Star Revenge 5.5 requested by SnowLily", "Find Nebby and Put it Back in the Bag", 3, 274385, "303497"),
     "SR5 OW1":          course_meta(0x0E, 0x04, 0x1A, 3, "the first overworld of Star Revenge 5", "Balance of Motion and Stillness", 3, 274383, "303495"),
@@ -704,20 +704,20 @@ course_infos = {
     
     // Aquarium
     "SR7 OW1":          course_meta(0x14, 0x01, 0x20, 0, "the first overworld of Star Revenge 7", "Star in the Totally Realistic Holes", 3, 274386, "303498"),
-    "SR7 OW2":          course_meta(0x14, 0x02, 0x20, 1, "the second overworld of Star Revenge 7", "Beneath the Gigant Isle", 1, 274387, "303499"),
+    "SR7 OW2":          course_meta(0x14, 0x02, 0x20, 1, "the second overworld of Star Revenge 7", "Beneath the Gigant Isle", 2, 274387, "303499"),
     
     // Slide
     "SotB2 NICV":       course_meta(0x1B, 0x01, 0x1D, 0, "the New Ice Cream Vault of Stars of the Beast 2", "Lava", 3, 274375, "303487"),
     "SotB OW1":         course_meta(0x1B, 0x02, 0x1D, 1, "the first overworld of Stars of the Beast", "Into the Mountainside", 1, 274374, "303486"),
     
     // Cloud Stage - bookmark
-    "SSB OW":           course_meta(0x1F, 0x01, 0x21, 0, "the overworld of Sunshine Secret Book 64", "Between the Two Sandfalls", 2, 274396, "303508"), // areas 2/3 also part of ssb
+    "SSB OW":           course_meta(0x1F, 0x01, 0x21, 0, "the overworld of Sunshine Secret Book 64", "Between the Two Sandfalls", 3, 274396, "303508"), // areas 2/3 also part of ssb
     "SS1r OW1":         course_meta(0x1F, 0x04, 0x21, 1, "the first overworld of Shining Stars Repainted", "Forest's Heart - Center of Attention", 1, 274394, "303506"),
     "SS1 OW1":          course_meta(0x1F, 0x05, 0x21, 2, "the first overworld of the original SM64: Shining Stars", "Remember Who You Are", 2, 274393, "303505"),
     
     // End Cake (need to check EEPROM)
-    "TWDE OW1":         course_meta(0x19, 0x01, 0x27, 0, "the first overworld of Treasure World: Dream Edition", "Over the Wooden Planks", 4, 274406, "303518"),
-    "TWDE OW2":         course_meta(0x19, 0x02, 0x27, 1, "the second overworld of Treasure World: Dream Edition", "Revolution of the Star", 4, 274407, "303519"),
+    "TWDE OW1":         course_meta(0x19, 0x01, 0x27, 0, "the first overworld of Treasure World: Dream Edition", "Over the Wooden Planks", 5, 274406, "303518"),
+    "TWDE OW2":         course_meta(0x19, 0x02, 0x27, 1, "the second overworld of Treasure World: Dream Edition", "Revolution of the Star", 5, 274407, "303519"),
     "VP OW2":           course_meta(0x19, 0x03, 0x27, 2, "the second overworld of Victory Plush", "A Cave Exploration", 2, 274409, "303521"),
     "Fantasy C1":       course_meta(0x19, 0x04, 0x27, 3, "Course 1 of Super Mario Fantasy", "The Bee's Treasure", 2, 274340, "303452"),
     
@@ -728,7 +728,7 @@ course_infos = {
     "Vanish Cap":       course_meta(0x10, 0x04, -1, -1, "the Vanish Cap Switch"),
     
     // Inside Castle (check EEPROM)
-    "PLUTO Iwer":       course_meta(0x06, 0x01, 0x0B, 0, "the overworld of Plutonium Mario 64 requested by Iwer Sonsch", "The Height of the Mountain", 1, 274364, "303476"),
+    "PLUTO Iwer":       course_meta(0x06, 0x01, 0x0B, 0, "the overworld of Plutonium Mario 64 requested by Iwer Sonsch", "The Height of the Mountain", 2, 274364, "303476"),
     "PLUTO WBM":        course_meta(0x06, 0x02, 0x0B, 1, "the overworld of Plutonium Mario 64 requested by WBM", "Ztar's Fourer Capital", 2, 274365, "303477"),
     
     // Castle Courtyard
@@ -905,8 +905,8 @@ coin_collects = [
     coin_collect_def(100, "Raining Blood", "Collect 100 coins in Course 8 of Star Revenge 4.5 (star).", 5, in_level("SR4.5 C8"), 274422, "303534"),
     coin_collect_def(100, "Spinning Fruits in Forest Town", "Collect 100 coins in Course 7 of Star Revenge 8 (star).", 10, in_level("SR8 C7"), 274423, "303535"),
     coin_collect_def(100, "Maximal Value of the Galaxy", "Collect 100 coins in Course 10 of Star Revenge 8 (star).", 5, in_level("SR8 C10"), 274424, "303536"),
-    coin_collect_def(100, "A Bomb of Light", "Collect 100 coins in Course 1 of Super Mario Fantasy (no star).", 5, in_level("Fantasy C1"), 274425, "303537"),
-    coin_collect_def(100, "The Edge of Possibility", "Collect 100 coins in the first overworld of Super Mario Treasure World (shared star).", 10, any_of(["TW OW1 galoomba", "TW OW1 Zaol", "TW OW1 Blocky"], a => in_level(a)), 274426, "303538"),
+    coin_collect_def(100, "A Bomb of Light", "Collect 100 coins in Course 1 of Super Mario Fantasy (no star).", 10, in_level("Fantasy C1"), 274425, "303537"),
+    coin_collect_def(100, "The Edge of Possibility", "Collect 100 coins in the first overworld of Super Mario Treasure World (shared star).", 25, any_of(["TW OW1 galoomba", "TW OW1 Zaol", "TW OW1 Blocky"], a => in_level(a)), 274426, "303538"),
     coin_collect_def(100, "Touching the Heavens", "Collect 100 coins in the second overworld of Super Mario Treasure World (shared star).", 10, any_of(["TW OW2 Zaol", "TW OW2 Iwer", "TW OW2 Blocky", "TW OW2 Tyler"], a => in_level(a)), 274427, "303539"),
     coin_collect_def(120, "Challenging Gold Nuggets", "Collect 120 coins in the first overworld of Treasure World Dream Edition (no star).", 25, in_level("TWDE OW1"), 274428, "303540"),
     coin_collect_def(120, "Pharaoh Eddie's Treasure", "Collect 120 coins in the second overworld of Treasure World Dream Edition (no star).", 25, in_level("TWDE OW2"), 274429, "303541"),
