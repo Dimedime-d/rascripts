@@ -32,6 +32,14 @@ function just_changed_from(mem, from) => prev(mem) == from && mem != from
 
 function struct_field(struct_def, base, field) => base + struct_def[field]
 
+// return a sequence incrementing by 1 from a specified starting value, for a specified length. convert to badge id strings if necessary.
+function sequence(start, length, badge=0) {
+    arr = range(start, start+length-1, 1)
+    if (badge != 0)
+        arr = array_map(arr, a => format("{0}", a))
+    return arr
+}
+
 offsets = {
     "SAVE DATA":    (0x207700 - 0x70),
     
@@ -735,28 +743,36 @@ achievement(
     title = "Ballsy Switcheroo",
     description = "Press the red, green, and blue !-switches.",
     points = 5,
-    trigger = rgb_trigger()
+    trigger = rgb_trigger(),
+    id=278385,
+    badge="308038"
 )
 
 achievement(
     title = "Defective Key",
     description = "Collect the key in the first BALLZer fight.",
     points = 5,
-    trigger = in_level("Key 1") && collected_star_action_check()
+    trigger = in_level("Key 1") && collected_star_action_check(),
+    id=278386,
+    badge="308039"
 )
 
 achievement(
     title = "Take Care",
     description = "Collect the key in the second BALLZer fight.",
     points = 10,
-    trigger = in_level("Key 2") && collected_star_action_check()
+    trigger = in_level("Key 2") && collected_star_action_check(),
+    id=278387,
+    badge="308040"
 )
 
 achievement(
     title = "Brown-ness Restored",
     description = "Collect the star in the final BALLZer fight.",
     points = 25,
-    trigger = in_level("Final Fight") && collected_star_action_check()
+    trigger = in_level("Final Fight") && collected_star_action_check(),
+    id=278388,
+    badge="308041"
 )
 
 // c o u r s e  s t a r s
@@ -838,38 +854,38 @@ function is_numbered_course(title) {
 function stars_meta(points, ids=[0,0,0,0,0,0,0,0], badge_ids=["0","0","0","0","0","0","0","0"]) => { "points": points, "ids": ids, "badge_ids": badge_ids }
 
 course_stars_meta = {
-    "Course 1":  stars_meta([3, 1, 1, 2, 2, 2]),
-    "Course 2":  stars_meta([2, 3, 4, 2, 3, 5]),
-    "Course 3":  stars_meta([2, 4, 5, 5, 1, 0]),
-    "Course 4":  stars_meta([3, 2, 2, 3, 4, 3]),
-    "Course 5":  stars_meta([3, 2, 2, 3, 10, 10]),
-    "Course 6":  stars_meta([1, 4, 3, 3, 5, 10]),
-    "Course 7":  stars_meta([4, 3, 5, 1, 5, 5]),
-    "Course 8":  stars_meta([4, 5, 3, 3, 10, 5]),
-    "Course 9":  stars_meta([10, 2, 10, 5, 10, 10]),
-    "Course 10": stars_meta([5, 5, 5, 4, 10, 10, 3]),
-    "Course 11": stars_meta([4, 2, 5, 10, 10, 5, 2]),
-    "Course 12": stars_meta([5, 5, 10, 25, 25, 5]),
-    "Course 13": stars_meta([10, 2, 3, 10, 5, 3]),
-    "Course 14": stars_meta([10, 5, 10, 10, 10, 10]),
-    "Course 15": stars_meta([5, 10, 10, 10, 10, 25]),
+    "Course 1":  stars_meta([3, 1, 1, 2, 2, 2], ids=sequence(278389, 6), badge_ids=sequence(308042, 6, badge=1)),
+    "Course 2":  stars_meta([2, 3, 4, 2, 3, 5], ids=sequence(278395, 6), badge_ids=sequence(308048, 6, badge=1)),
+    "Course 3":  stars_meta([2, 4, 5, 5, 1, 0], ids=sequence(278401, 6), badge_ids=sequence(308054, 6, badge=1)),
+    "Course 4":  stars_meta([3, 2, 2, 3, 4, 3], ids=sequence(278407, 6), badge_ids=sequence(308060, 6, badge=1)),
+    "Course 5":  stars_meta([3, 2, 2, 3, 10, 10], ids=sequence(278413, 6), badge_ids=sequence(308066, 6, badge=1)),
+    "Course 6":  stars_meta([1, 4, 3, 3, 5, 10], ids=sequence(278419, 6), badge_ids=sequence(308072, 6, badge=1)),
+    "Course 7":  stars_meta([4, 3, 5, 1, 5, 5], ids=sequence(278425, 6), badge_ids=sequence(308078, 6, badge=1)),
+    "Course 8":  stars_meta([4, 5, 3, 3, 10, 5], ids=sequence(278431, 6), badge_ids=sequence(308084, 6, badge=1)),
+    "Course 9":  stars_meta([10, 2, 10, 5, 10, 10], ids=sequence(278437, 6), badge_ids=sequence(308090, 6, badge=1)),
+    "Course 10": stars_meta([5, 5, 5, 4, 10, 10, 3], ids=sequence(278443, 7), badge_ids=sequence(308096, 7, badge=1)),
+    "Course 11": stars_meta([4, 2, 5, 10, 10, 5, 2], ids=sequence(278450, 7), badge_ids=sequence(308103, 7, badge=1)),
+    "Course 12": stars_meta([5, 5, 10, 25, 25, 5], ids=sequence(278457, 6), badge_ids=sequence(308110, 6, badge=1)),
+    "Course 13": stars_meta([10, 2, 3, 10, 5, 3], ids=sequence(278463, 6), badge_ids=sequence(308116, 6, badge=1)),
+    "Course 14": stars_meta([10, 5, 10, 10, 10, 10], ids=sequence(278469, 6), badge_ids=sequence(308122, 6, badge=1)),
+    "Course 15": stars_meta([5, 10, 10, 10, 10, 25], ids=sequence(278475, 6), badge_ids=sequence(308128, 6, badge=1)),
     
-    "Metal Cap": stars_meta([5, 3, 10]),
-    "Vanish Cap":stars_meta([5, 4, 10]),
-    "Wing Cap":  stars_meta([5, 4, 5]),
+    "Metal Cap": stars_meta([5, 3, 10], ids=sequence(278481, 3), badge_ids=sequence(308134, 6, badge=1)),
+    "Vanish Cap":stars_meta([5, 4, 10], ids=sequence(278484, 3), badge_ids=sequence(308137, 6, badge=1)),
+    "Wing Cap":  stars_meta([5, 4, 5], ids=sequence(278487, 3), badge_ids=sequence(308140, 6, badge=1)),
     
-    "Bowser 1":  stars_meta([10, 4, 4, 5]),
-    "Bowser 2":  stars_meta([2, 2, 5, 2, 4]),
-    "Bowser 3":  stars_meta([25, 5, 5, 10, 10, 5, 25]),
+    "Bowser 1":  stars_meta([10, 4, 4, 5], ids=sequence(278490, 4), badge_ids=sequence(308143, 4, badge=1)),
+    "Bowser 2":  stars_meta([2, 2, 5, 2, 4], ids=sequence(278494, 5), badge_ids=sequence(308147, 5, badge=1)),
+    "Bowser 3":  stars_meta([25, 5, 5, 10, 10, 5, 25], ids=sequence(278499, 7), badge_ids=sequence(308152, 7, badge=1)),
     
-    "Slide":     stars_meta([2, 5, 2, 2]), // TD
-    "Aquarium":  stars_meta([4, 2, 5, 5, 5, 5]), // ES
-    "End Cake Picture": stars_meta([10, 25, 25, 10, 10]), // BB
-    "Clouds":    stars_meta([25, 10, 25, 25, 25]), // BP
+    "Slide":     stars_meta([2, 5, 2, 2], ids=sequence(278506, 4), badge_ids=sequence(308159, 4, badge=1)), // TD
+    "Aquarium":  stars_meta([4, 2, 5, 5, 5, 5], ids=sequence(278510, 6), badge_ids=sequence(308163, 6, badge=1)), // ES
+    "End Cake Picture": stars_meta([10, 25, 25, 10, 10], ids=sequence(278516, 5), badge_ids=sequence(308169, 5, badge=1)), // BB
+    "Clouds":    stars_meta([25, 10, 25, 25, 25], ids=sequence(278521, 5), badge_ids=sequence(308174, 5, badge=1)), // BP
     
-    "Castle Grounds": stars_meta([1, -1, -1, 3]),
-    "Inside Castle":  stars_meta([-1, 2, -1, -1, 3]),
-    "Castle Courtyard": stars_meta([-1, -1, 1, -1, -1, 3]),
+    "Castle Grounds": stars_meta([1, -1, -1, 3], ids=[278526, -1, -1, 278527], badge_ids=["308179", "", "", "308180"]),
+    "Inside Castle":  stars_meta([-1, 2, -1, -1, 3], ids=[-1, 278528, -1, -1, 278529], badge_ids=["", "308181", "", "", "308182"]),
+    "Castle Courtyard": stars_meta([-1, -1, 1, -1, -1, 3],  ids=[-1, -1, 278530, -1, -1, 278531], badge_ids=["", "", "308183", "", "", "308184"]),
 }
 
 function course_star_achievements() {
@@ -893,10 +909,12 @@ function course_star_achievements() {
                     desc = format("{0} Answers are 100% factual!", desc)
                 
                 achievement(
-                title = title,
-                description = desc,
-                points = course_stars_meta[course]["points"][i],
-                trigger = in_level(course) && collected_star_action_check(star_index = i+1)
+                    title = title,
+                    description = desc,
+                    points = course_stars_meta[course]["points"][i],
+                    trigger = in_level(course) && collected_star_action_check(star_index = i+1),
+                    id=course_stars_meta[course]["ids"][i],
+                    badge=course_stars_meta[course]["badge_ids"][i]
                     )
                 }
             }
@@ -952,63 +970,77 @@ mushies_data = [
     mushies_meta("Course 3", "Canada Life",
         "Collect the 1-up mushroom in {0}.", 1,
         [{"type": "impartial", "count": 1}],
-        level_check=remained_in_level("Course 3", hit=0)),
+        level_check=remained_in_level("Course 3", hit=0),
+        id=278532, badge="308185"),
     mushies_meta("Bowser 1", "Defective Life",
         "Collect the 1-up mushroom in {0}.", 1,
         [{"type": "stationary", "count": 1}],
-        level_check=remained_in_level("Bowser 1", hit=0)),
+        level_check=remained_in_level("Bowser 1", hit=0),
+        id=278533, badge="308186"),
     mushies_meta("Vanish Cap", "Grandma's Mushrooms",
         "Collect both 1-up mushroom in {0}.", 2,
         [{"type": "stationary", "count": 2}],
-        level_check=remained_in_level("Vanish Cap", hit=0)),
+        level_check=remained_in_level("Vanish Cap", hit=0),
+        id=278534, badge="308187"),
     mushies_meta("Metal Cap", "Corny Life",
         "Collect the 1-up mushroom in {0}.", 1,
         [{"type": "impartial", "count": 1}],
-        level_check=remained_in_level("Metal Cap", hit=0)),
+        level_check=remained_in_level("Metal Cap", hit=0),
+        id=278535, badge="308188"),
         
     mushies_meta("Inside Castle", "Patio Life",
         "Collect the 1-up mushroom in {0}.", 1,
         [{"type": "stationary", "count": 1}],
-        level_check=remained_in_level("Inside Castle", hit=0)),
+        level_check=remained_in_level("Inside Castle", hit=0),
+        id=278536, badge="308189"),
     mushies_meta("Course 5", "Magical Lives",
         "Collect all 4 1-up mushrooms in {0}.", 4,
         [{"type": "stationary", "count": 3},
          {"type": "impartial",  "count": 1}],
-        level_check=remained_in_level("Course 5", hit=0)),
+        level_check=remained_in_level("Course 5", hit=0),
+        id=278537, badge="308190"),
     mushies_meta("Course 7", "Drat, a Lost Life",
         "Collect the 1-up mushroom in {0} on a quicksand slope.", 1,
         [{"type": "stationary", "count": 1}],
-        level_check=remained_in_level("Course 7", hit=0) && pos_x() > 3000.0),
+        level_check=remained_in_level("Course 7", hit=0) && pos_x() > 3000.0,
+        id=278538, badge="308191"),
     mushies_meta("Course 7", "Blast, Another Lost Life",
         "Collect the 1-up mushroom in {0} between two walls.", 1,
         [{"type": "stationary", "count": 1}],
-        level_check=remained_in_level("Course 7", hit=0) && pos_x() < 3000.0),
+        level_check=remained_in_level("Course 7", hit=0) && pos_x() < 3000.0,
+        id=278539, badge="308192"),
     mushies_meta("Course 8", "Ancestral Lives",
         "Collect both 1-up mushrooms in {0}.", 2,
         [{"type": "stationary", "count": 2}],
-        level_check=remained_in_level("Course 8", hit=0)),
+        level_check=remained_in_level("Course 8", hit=0),
+        id=278540, badge="308193"),
     mushies_meta("Aquarium", "Ballsy Life",
         "Collect the 1-up mushroom in {0}.", 1,
         [{"type": "stationary", "count": 1}],
-        level_check=remained_in_level("Aquarium", hit=0)),
+        level_check=remained_in_level("Aquarium", hit=0),
+        id=278541, badge="308194"),
         
     mushies_meta("Course 11", "Toilet Bowl Life",
         "Collect the 1-up mushroom in {0}.", 1,
         [{"type": "impartial", "count": 1}],
-        level_check=remained_in_level("Course 11", hit=0)),   
+        level_check=remained_in_level("Course 11", hit=0),
+        id=278542, badge="308195"),   
     mushies_meta("Course 12", "Cliffside Life",
         "Collect the 1-up mushroom in {0}.", 1,
         [{"type": "stationary", "count": 1}],
-        level_check=remained_in_level("Course 12", hit=0)),
+        level_check=remained_in_level("Course 12", hit=0),
+        id=278543, badge="308196"),
     mushies_meta("Course 15", "Gardening Mushrooms",
         "Collect all 20 1-up mushrooms in {0}.", 10,
         [{"type": "stationary", "count": 18},
          {"type": "impartial",  "count": 2}],
-        level_check=remained_in_level("Course 15", hit=0)),
+        level_check=remained_in_level("Course 15", hit=0),
+        id=278544, badge="308197"),
     mushies_meta("Final Fight", "BALLZer's Lost Mushroom",
         "Collect the 1-up mushroom in the final BALLZer fight.", 1,
         [{"type": "impartial", "count": 2}],
-        level_check=remained_in_level("Final Fight", hit=0))
+        level_check=remained_in_level("Final Fight", hit=0),
+        id=278545, badge="308198")
 ]
 
 function mushie_cheevs() {
@@ -1095,7 +1127,9 @@ achievement(
     title = "Brown Gold",
     description = "Collect 100 coins in the first course.",
     points = 3,
-    trigger = prev(coin_display()) == 99 && measured(coin_display() == 100, when=in_level("Course 1"))
+    trigger = prev(coin_display()) == 99 && measured(coin_display() == 100, when=in_level("Course 1")),
+    id=278546,
+    badge="308199"
 )
 
 c2_whomp = nth_array_object(76)
@@ -1111,7 +1145,9 @@ achievement(
         && object_active(c2_whomp) != 0
         && never(hp() < prev(hp())) // no water damage to take...
         && never(object_is(c2_whomp, "king whomp") && just_changed_to(object_action(c2_whomp), 0)) // fight deactivated
-        && trigger_when(just_changed(object_health(c2_whomp), 1, 0))
+        && trigger_when(just_changed(object_health(c2_whomp), 1, 0)),
+    id=278547,
+    badge="308200"
 )
 
 c2_pipe = nth_array_object(93)
@@ -1123,7 +1159,9 @@ achievement(
     trigger = in_level("Course 2")
         && object_is(c2_pipe, "warp pipe")
         && prev(wearing_metal_cap()) != 0
-        && (used_object() == c2_pipe && interaction_object() == c2_pipe)
+        && (used_object() == c2_pipe && interaction_object() == c2_pipe),
+    id=278548,
+    badge="308201"
 )
 
 achievement(
@@ -1132,7 +1170,9 @@ achievement(
     points = 1,
     trigger = remained_in_level("Course 3", hit=1)
         && never(just_increased(controller_a_button()))
-        && trigger_when(collected_star_action_check(0x05))
+        && trigger_when(collected_star_action_check(0x05)),
+    id=278549,
+    badge="308202"
 )
 
 achievement(
@@ -1142,7 +1182,9 @@ achievement(
     trigger = remained_in_level("Course 4", hit=1)
         && mission__mem == 6
         && never(just_increased(wearing_wing_cap()))
-        && trigger_when(collected_star_action_check(0x06))
+        && trigger_when(collected_star_action_check(0x06)),
+    id=278550,
+    badge="308203"
 )
 
 c5_eyeball = nth_array_object(27)
@@ -1158,7 +1200,9 @@ achievement(
             && object_is(c5_eyeball, "mr. i")
             && object_beh_param_2(c5_eyeball) == 1 // big
             && just_changed(object_action(c5_eyeball), 2, 3))
-        && trigger_when(collecting_star_object("spawned star", 0))
+        && trigger_when(collecting_star_object("spawned star", 0)),
+    id=278551,
+    badge="308204"
 )
 
 c6_scuts = array_map([33, 34, 35, 36], a => nth_array_object(a))
@@ -1176,7 +1220,9 @@ achievement(
     points = 2,
     trigger = remained_in_level("Course 6", hit=0)
         && ((measured(tally_dead_scuts(4)))
-        || (tally_dead_scuts(1) && trigger_when(impossible_condition())))
+        || (tally_dead_scuts(1) && trigger_when(impossible_condition()))),
+    id=278552,
+    badge="308205"
 )
 
 c7_switch = nth_array_object(41)
@@ -1188,7 +1234,9 @@ achievement(
     trigger = in_level("Course 7")
         && object_is(c7_switch, "purple switch")
         && object_action(c7_switch) == 2
-        && trigger_when(collected_star_action_check(0x02))
+        && trigger_when(collected_star_action_check(0x02)),
+    id=278553,
+    badge="308206"
 )
 
 achievement(
@@ -1198,7 +1246,9 @@ achievement(
     trigger = remained_in_level("Course 8", hit=1)
         && never(just_increased(hp_decrement()))
         && never(any_of(burning_actions, a => mario_action_changed_to(a)))
-        && trigger_when(collected_star_action_check(0x01))
+        && trigger_when(collected_star_action_check(0x01)),
+    id=278554,
+    badge="308207"
 )
 
 c9_wiggler = nth_array_object(99)
@@ -1212,7 +1262,9 @@ achievement(
         && never(any_of(burning_actions, a => mario_action_changed_to(a)))
         && object_is(c9_wiggler, "wiggler")
         && trigger_when(object_health(c9_wiggler) == 2
-            && just_changed_to(object_action(c9_wiggler), 3)) // wiggler act jumped on
+            && just_changed_to(object_action(c9_wiggler), 3)),
+    id=278555,
+    badge="308208" // wiggler act jumped on
         // wiggler doesn't die, just shrinks at 1 hp
 )
 
@@ -1222,7 +1274,9 @@ achievement(
     points = 10,
     trigger = remained_in_level("Course 10", hit=1)
         && never(mario_action_changed_to("triple jump"))
-        && trigger_when(collected_star_action_check(0x03))
+        && trigger_when(collected_star_action_check(0x03)),
+    id=278556,
+    badge="308209"
 )
 
 achievement(
@@ -1234,7 +1288,9 @@ achievement(
         && pos_x() < -2000.0
         && pos_z() > -5000.0
         && pos_z() < 7000.0
-        && trigger_when(collected_star_action_check(4))
+        && trigger_when(collected_star_action_check(4)),
+    id=278557,
+    badge="308210"
 )
 
 achievement(
@@ -1245,7 +1301,9 @@ achievement(
         && in_3d_box(-3000.0, 2000.0, 500.0, -6500.0, -7000.0, -2000.0)
         && never(just_increased(hp_decrement()))
         && never(any_of(burning_actions, a => mario_action_changed_to(a)))
-        && trigger_when(collected_star_action_check(2))
+        && trigger_when(collected_star_action_check(2)),
+    id=278558,
+    badge="308211"
 )
 
 c13_switch_near_alcove = nth_array_object(54)
@@ -1257,7 +1315,9 @@ achievement(
     trigger = in_level("Course 13")
         && object_is(c13_switch_near_alcove, "purple switch")
         && object_action(c13_switch_near_alcove) == 2
-        && trigger_when(collected_star_action_check(0x03))
+        && trigger_when(collected_star_action_check(0x03)),
+    id=278559,
+    badge="308212"
 )
 
 c14_entered_fight = in_3d_box(5500.0, 6500.0, 2000.0, 1000.0, -7000.0, -7500.0)
@@ -1271,7 +1331,9 @@ achievement(
     trigger = remained_in_level("Course 14", hit=1)
         && once(c14_entered_fight)
         && never(c14_challenge_fail)
-        && trigger_when(object_is(c14_big_boo, "big boo") && just_changed(object_health(c14_big_boo), 1, 0))
+        && trigger_when(object_is(c14_big_boo, "big boo") && just_changed(object_health(c14_big_boo), 1, 0)),
+    id=278560,
+    badge="308213"
 )
 
 achievement(
@@ -1281,7 +1343,9 @@ achievement(
     trigger = in_level("Course 14")
         && warp_transition_active() != 0
         && warp_transition_type() == WARP_TRANSITION_FADE_INTO_CIRCLE
-        && trigger_when(collecting_star_object("regular star", 5))
+        && trigger_when(collecting_star_object("regular star", 5)),
+    id=278561,
+    badge="308214"
 )
 
 c15_snowmen = array_map([42, 43, 44], a => nth_array_object(a))
@@ -1299,7 +1363,9 @@ achievement(
     points = 5,
     trigger = remained_in_level("Course 15", hit=0)
         && (measured(tally_snowmen_dead(length(c15_snowmen)))
-            || (tally_snowmen_dead(1) && trigger_when(impossible_condition())))
+            || (tally_snowmen_dead(1) && trigger_when(impossible_condition()))),
+    id=278562,
+    badge="308215"
 )
 
 achievement(
@@ -1309,7 +1375,9 @@ achievement(
     trigger = remained_in_level("Bowser 2", hit=1)
         && never(hp_decrement() > 0)
         && never(any_of(burning_actions, a => mario_action_is(a)))
-        && trigger_when(collected_star_action_check(0x03))
+        && trigger_when(collected_star_action_check(0x03)),
+    id=278563,
+    badge="308216"
 )
 
 achievement(
@@ -1319,7 +1387,9 @@ achievement(
     trigger = remained_in_level("Final Fight", hit=1)
         && never(hp_decrement() > 0)
         && never(any_of(burning_actions, a => mario_action_is(a)))
-        && trigger_when(collected_star_action_check(0x0B)) // troll star
+        && trigger_when(collected_star_action_check(0x0B)),
+    id=278564,
+    badge="308217" // troll star
 )
 
 achievement(
@@ -1329,7 +1399,9 @@ achievement(
     trigger = remained_in_level("Castle Grounds", hit=0)
         && once(just_changed(g_red_coins_collected__mem, 0, 1))
         && never(mario_action_changed_to("death exit landing"))
-        && trigger_when(collected_star_action_check(0x04))
+        && trigger_when(collected_star_action_check(0x04)),
+    id=278565,
+    badge="308218"
 )
 
 got_one_red = nof_coins() == prev(nof_coins()) + 2
@@ -1339,12 +1411,12 @@ achievement(
     description = "Collect all 17 red coins in the third overworld.",
     points = 10,
     trigger = remained_in_level("Castle Courtyard", hit=0)
-        && (measured(repeated(17, got_one_red), when=in_level("Castle Courtyard")) || (once(got_one_red) && trigger_when(impossible_condition())))
+        && (measured(repeated(17, got_one_red), when=in_level("Castle Courtyard")) || (once(got_one_red) && trigger_when(impossible_condition()))),
+    id=278566,
+    badge="308219"
 )
 
 // RP
-
-
 
 meta_descriptions = {
     0x00: "Starting up the game",
