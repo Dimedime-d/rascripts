@@ -673,13 +673,13 @@ course_infos = {
     "BSA OW2":          course_meta(0x08, 0x01, 0x10, 0, "the first overworld of Bloo Star Adventure", "Illusion Picture Room", 1, 274339, "303451"),
     "ASA OW1":          course_meta(0x08, 0x02, 0x10, 1, "the first overworld of All Star Adventure", "The Ways of the Water System", 3, 274338, "303450"),
     
-    "TW OW1 galoomba":  course_meta(0x17, 0x01, 0x17, 0, "the first overworld of Super Mario Treasure World requeseted by galoomba", "Door-Knocking", 3, 274400, "303512"),
-    "TW OW1 Zaol":      course_meta(0x17, 0x02, 0x17, 1, "the first overworld of Super Mario Treasure World requeseted by Zaoldieck", "Jealousy of 91", 3, 274401, "303513"),
-    "TW OW2 Zaol":      course_meta(0x17, 0x03, 0x17, 2, "the second overworld of Super Mario Treasure World requeseted by Zaoldieck", "Inhabitant of the Sand Street", 4, 274405, "303517"),
-    "TW OW2 Iwer":      course_meta(0x17, 0x04, 0x17, 3, "the second overworld of Super Mario Treasure World requeseted by Iwer Sonsch", "Watch for Rolling Balls in More Than 0.5 A Presses", 4, 274403, "303515"),
-    "TW OW1 Blocky":    course_meta(0x17, 0x05, 0x17, 4, "the first overworld of Super Mario Treasure World requeseted by BlockyGamez", "A Sign's Revenge", 3, 274399, "303511"),
-    "TW OW2 Blocky":    course_meta(0x17, 0x06, 0x17, 5, "the second overworld of Super Mario Treasure World requeseted by BlockyGamez", "Trust the Boxes of the Quicksand Sea?", 4, 274402, "303514"),
-    "TW OW2 Tyler":     course_meta(0x17, 0x07, 0x17, 6, "the second overworld of Super Mario Treasure World requeseted by TylerSM64", "Chilly Lookout", 4, 274404, "303516"),
+    "TW OW1 galoomba":  course_meta(0x17, 0x01, 0x17, 0, "the first overworld of Super Mario Treasure World requested by galoomba", "Door-Knocking", 3, 274400, "303512"),
+    "TW OW1 Zaol":      course_meta(0x17, 0x02, 0x17, 1, "the first overworld of Super Mario Treasure World requested by Zaoldieck", "Jealousy of 91", 3, 274401, "303513"),
+    "TW OW2 Zaol":      course_meta(0x17, 0x03, 0x17, 2, "the second overworld of Super Mario Treasure World requested by Zaoldieck", "Inhabitant of the Sand Street", 4, 274405, "303517"),
+    "TW OW2 Iwer":      course_meta(0x17, 0x04, 0x17, 3, "the second overworld of Super Mario Treasure World requested by Iwer Sonsch", "Watch for Rolling Balls in More Than 0.5 A Presses", 4, 274403, "303515"),
+    "TW OW1 Blocky":    course_meta(0x17, 0x05, 0x17, 4, "the first overworld of Super Mario Treasure World requested by BlockyGamez", "A Sign's Revenge", 3, 274399, "303511"),
+    "TW OW2 Blocky":    course_meta(0x17, 0x06, 0x17, 5, "the second overworld of Super Mario Treasure World requested by BlockyGamez", "Trust the Boxes of the Quicksand Sea?", 4, 274402, "303514"),
+    "TW OW2 Tyler":     course_meta(0x17, 0x07, 0x17, 6, "the second overworld of Super Mario Treasure World requested by TylerSM64", "Chilly Lookout", 4, 274404, "303516"),
     
     // c10
     "KBR2 OW3 Morning": course_meta(0x0A, 0x01, 0x16, 0, "the third overworld of King Boo's Revenge 2 requested by MorningStorm", "The Boos Remain Unimpressed", 2, 274347, "303459"),
