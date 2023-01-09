@@ -609,7 +609,7 @@ course_infos = {
     "Course 14":        course_meta(0x0e, [-1],   "Apocalyptic Sewers", "the fourteenth course"),
     "Course 15":        course_meta(0x0f, [-1],   "Refined Pleasant Gardening Paradox", "the fifteenth course"),
     
-    "Slide":            course_meta(0x1b, [-1],   "Tsucnent's Doors"),
+    "Slide":            course_meta(0x1b, [-1],   "TsucnenT's Doors"),
     "Aquarium":         course_meta(0x14, [-1],   "Eclipse of a Stupider Ball"),
     "End Cake Picture": course_meta(0x19, [-1],   "Brownerlasting BALLZcore"),
     "Clouds":           course_meta(0x1f, [-1],   "Browner Plane of Existence"),
@@ -1038,7 +1038,7 @@ mushies_data = [
         id=278544, badge="308197"),
     mushies_meta("Final Fight", "BALLZer's Lost Mushroom",
         "Collect the 1-up mushroom in the final BALLZer fight.", 1,
-        [{"type": "impartial", "count": 2}],
+        [{"type": "impartial", "count": 1}],
         level_check=remained_in_level("Final Fight", hit=0),
         id=278545, badge="308198")
 ]
