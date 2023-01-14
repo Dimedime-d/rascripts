@@ -749,9 +749,9 @@ achievement(
 )
 
 achievement(
-    title = "Defective Key",
+    title = "Key of Intense Hatred",
     description = "Collect the key in the first BALLZer fight.",
-    points = 5,
+    points = 10,
     trigger = in_level("Key 1") && collected_star_action_check(),
     id=278386,
     badge="308039"
@@ -791,7 +791,7 @@ course_star_titles = [
     {"Course 3":
     ["Cliffside Platforms", "Cold Red Coins", "Hot Wallkicks", "Chuckya Couples", "Hexagonal Cutout in the Floor", "Rewarding Kaizo Trap"]},
     {"Course 4":
-    ["Over the Triangle Obstacles", "Diving with the Vanish Cap", "A Tight Lava Passage", "Secrets of the Soda", "Not Quite Cherry Coins", "Flying for Panels"]},
+    ["Over the Triangle Obstacles", "Diving with Grandma", "A Tight Lava Passage", "Secrets of the Soda", "Not Quite Cherry Coins", "Flying for Panels"]},
     {"Course 5":
     ["Easy Eyeball Fight", "Hidden Grandma", "Filler Metal Cap Lavabouncing", "Low Wallkicks for Red Coins", "Tower of Tight Arches", "Intense Purple Switch Jumps"]},
     {"Course 6":
@@ -818,7 +818,7 @@ course_star_titles = [
     {"Metal Cap":
     ["Single Lavabunce Arch", "Roasted Fly Guys", "Blazing Corn Secrets"]},
     {"Vanish Cap":
-    ["Beyond the Switch", "Chill Bully's Box Arena", "Grandma's Cold Secrets"]},
+    ["Beyond the Switch", "Chill Bully's Box Arena", "Grandma's Cold Buddies"]},
     {"Wing Cap":
     ["The Star Next to the Switch", "Top of the Tower", "Ascending Secrets"]},
     
@@ -858,17 +858,17 @@ course_stars_meta = {
     "Course 2":  stars_meta([2, 3, 4, 2, 3, 5], ids=sequence(278395, 6), badge_ids=sequence(308048, 6, badge=1)),
     "Course 3":  stars_meta([2, 4, 5, 5, 1, 0], ids=sequence(278401, 6), badge_ids=sequence(308054, 6, badge=1)),
     "Course 4":  stars_meta([3, 2, 2, 3, 4, 3], ids=sequence(278407, 6), badge_ids=sequence(308060, 6, badge=1)),
-    "Course 5":  stars_meta([3, 2, 2, 3, 10, 10], ids=sequence(278413, 6), badge_ids=sequence(308066, 6, badge=1)),
-    "Course 6":  stars_meta([1, 4, 3, 3, 5, 10], ids=sequence(278419, 6), badge_ids=sequence(308072, 6, badge=1)),
-    "Course 7":  stars_meta([4, 3, 5, 1, 5, 5], ids=sequence(278425, 6), badge_ids=sequence(308078, 6, badge=1)),
-    "Course 8":  stars_meta([4, 5, 3, 3, 10, 5], ids=sequence(278431, 6), badge_ids=sequence(308084, 6, badge=1)),
+    "Course 5":  stars_meta([4, 2, 2, 3, 10, 10], ids=sequence(278413, 6), badge_ids=sequence(308066, 6, badge=1)),
+    "Course 6":  stars_meta([1, 4, 3, 4, 5, 10], ids=sequence(278419, 6), badge_ids=sequence(308072, 6, badge=1)),
+    "Course 7":  stars_meta([5, 3, 5, 1, 5, 5], ids=sequence(278425, 6), badge_ids=sequence(308078, 6, badge=1)),
+    "Course 8":  stars_meta([4, 5, 4, 3, 10, 5], ids=sequence(278431, 6), badge_ids=sequence(308084, 6, badge=1)),
     "Course 9":  stars_meta([10, 2, 10, 5, 10, 10], ids=sequence(278437, 6), badge_ids=sequence(308090, 6, badge=1)),
     "Course 10": stars_meta([5, 5, 5, 4, 10, 10, 3], ids=sequence(278443, 7), badge_ids=sequence(308096, 7, badge=1)),
     "Course 11": stars_meta([4, 2, 5, 10, 10, 5, 2], ids=sequence(278450, 7), badge_ids=sequence(308103, 7, badge=1)),
-    "Course 12": stars_meta([5, 5, 10, 25, 25, 5], ids=sequence(278457, 6), badge_ids=sequence(308110, 6, badge=1)),
-    "Course 13": stars_meta([10, 2, 3, 10, 5, 3], ids=sequence(278463, 6), badge_ids=sequence(308116, 6, badge=1)),
+    "Course 12": stars_meta([5, 5, 10, 50, 25, 10], ids=sequence(278457, 6), badge_ids=sequence(308110, 6, badge=1)),
+    "Course 13": stars_meta([10, 3, 3, 10, 5, 3], ids=sequence(278463, 6), badge_ids=sequence(308116, 6, badge=1)),
     "Course 14": stars_meta([10, 5, 10, 10, 10, 10], ids=sequence(278469, 6), badge_ids=sequence(308122, 6, badge=1)),
-    "Course 15": stars_meta([5, 10, 10, 10, 10, 25], ids=sequence(278475, 6), badge_ids=sequence(308128, 6, badge=1)),
+    "Course 15": stars_meta([5, 10, 10, 10, 25, 25], ids=sequence(278475, 6), badge_ids=sequence(308128, 6, badge=1)),
     
     "Metal Cap": stars_meta([5, 3, 10], ids=sequence(278481, 3), badge_ids=sequence(308134, 6, badge=1)),
     "Vanish Cap":stars_meta([5, 4, 10], ids=sequence(278484, 3), badge_ids=sequence(308137, 6, badge=1)),
@@ -876,12 +876,12 @@ course_stars_meta = {
     
     "Bowser 1":  stars_meta([10, 4, 4, 5], ids=sequence(278490, 4), badge_ids=sequence(308143, 4, badge=1)),
     "Bowser 2":  stars_meta([2, 2, 5, 2, 4], ids=sequence(278494, 5), badge_ids=sequence(308147, 5, badge=1)),
-    "Bowser 3":  stars_meta([25, 5, 5, 10, 10, 5, 25], ids=sequence(278499, 7), badge_ids=sequence(308152, 7, badge=1)),
+    "Bowser 3":  stars_meta([25, 5, 5, 10, 10, 5, 50], ids=sequence(278499, 7), badge_ids=sequence(308152, 7, badge=1)),
     
     "Slide":     stars_meta([2, 5, 2, 2], ids=sequence(278506, 4), badge_ids=sequence(308159, 4, badge=1)), // TD
-    "Aquarium":  stars_meta([4, 2, 5, 5, 5, 5], ids=sequence(278510, 6), badge_ids=sequence(308163, 6, badge=1)), // ES
+    "Aquarium":  stars_meta([4, 2, 5, 10, 5, 5], ids=sequence(278510, 6), badge_ids=sequence(308163, 6, badge=1)), // ES
     "End Cake Picture": stars_meta([10, 25, 25, 10, 10], ids=sequence(278516, 5), badge_ids=sequence(308169, 5, badge=1)), // BB
-    "Clouds":    stars_meta([25, 10, 25, 25, 25], ids=sequence(278521, 5), badge_ids=sequence(308174, 5, badge=1)), // BP
+    "Clouds":    stars_meta([25, 25, 25, 25, 25], ids=sequence(278521, 5), badge_ids=sequence(308174, 5, badge=1)), // BP
     
     "Castle Grounds": stars_meta([1, -1, -1, 3], ids=[278526, -1, -1, 278527], badge_ids=["308179", "", "", "308180"]),
     "Inside Castle":  stars_meta([-1, 2, -1, -1, 3], ids=[-1, 278528, -1, -1, 278529], badge_ids=["", "308181", "", "", "308182"]),
