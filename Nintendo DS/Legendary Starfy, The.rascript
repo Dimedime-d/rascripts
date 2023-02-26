@@ -420,7 +420,7 @@ bosses = {
         "conds": no_damage(), "health deltas": [2]},
     "Terrible Trio": {"title": "They're Still Not That Threatening", "description": "Defeat the Terrible Trio without taking damage", "points": 5,
         "conds": no_damage(), "health deltas": [1]},
-    "Mashtooth": {"title": "Top Space Pirate", "description": "Defeat Mashtooth without taking damage", "points": 5,
+    "Mashtooth": {"title": "Top Space Pirate", "description": "Defeat Mashtooth's first form without taking damage", "points": 5,
         "conds": no_damage(), "health deltas": [1, 2]},
     "Old Man Lobber": {"title": "Living Legend", "description": "Defeat Old Man Lobber without taking damage", "points": 10,
         "conds": no_damage(), "health deltas": [1]}
@@ -587,7 +587,7 @@ for stage in stage_complete{
 // Slightly different timing
 achievement(
     title = "Peace to this Galaxy",
-    description = "Defeat Mashtooth and restore the Bunnerans' special power!",
+    description = "Defeat Mashtooth (for good).",
     points = 10,
     // trigger = once(just_increased(area_complete__mem(8, 4))) && game_state_is("Credits") && never(game_state_is("Title Screen"))
     trigger = boss_room__conds["Mega Mashtooth"] && game_state_just_changed("Play Area", "Story Cartoon")
@@ -595,7 +595,7 @@ achievement(
 
 achievement(
     title = "Bunston's Past",
-    description = "Defeat Mashtooth with all 102 treasure chests and unlock the Missing Chapter after the credits!",
+    description = "Defeat Mashtooth with all area secrets cleared and watch the Missing Chapter after the credits!",
     points = 10,
     trigger = once(game_state_is("Credits")) && in_story_cartoon("Missing Chapter") && never(game_state_is("Title Screen"))
 )
@@ -641,7 +641,7 @@ function timer_cond_measured() {
 
 leaderboard(
     title = "Big Bossdown (Starfy)",
-    description = "Beat all bosses as fast as possible",
+    description = "Fastest Time",
     start = big_bossdown_start() && boss_fight_just_started() && char_is("Starfy"),
     cancel = big_bossdown_cancel(),
     submit = big_bossdown_finish(),
@@ -650,7 +650,7 @@ leaderboard(
 
 leaderboard(
     title = "Big Bossdown (Starly)",
-    description = "Beat all bosses as fast as possible",
+    description = "Fastest Time",
     start = big_bossdown_start() && boss_fight_just_started() && char_is("Starly"),
     cancel = big_bossdown_cancel(),
     submit = big_bossdown_finish(),
@@ -696,7 +696,7 @@ for key in bossdown_time_attack {
 
 achievement(
     title = "Pink Powder Keg",
-    description = "Complete Big Bossdown with Starly and unlock her ending!",
+    description = "Complete Big Bossdown with Starly and watch her ending!",
     points = 10,
     trigger = big_bossdown_start() && once(boss_fight_just_started() && char_is("Starly")) && in_story_cartoon("Starly Bossdown Ending")
 )
@@ -935,7 +935,7 @@ achievement(
 
 achievement(
     title = "Exotic Heart Gem",
-    description = "Reel in Moe in the Fishing Derby Minigame and score 5 points at once!",
+    description = "Reel in Moe in the Fishing Derby minigame and score 5 points at once!",
     points = 2,
     trigger = game_state_is("Fishing Derby")
         && just_changed(fishing_derby_increment_counter__mem(), 0, 5)
@@ -1198,7 +1198,7 @@ characters = {
     0x0B: "Starly"
 }
 
-character__lookup = rich_presence_lookup("Character", char__mem(), characters)
+character__lookup = rich_presence_lookup("Character", char__mem(), characters, "Starfy")
 
 player_health__value = rich_presence_value("Number", current_health__mem())
 player_max_health__value = rich_presence_value("Number", max_health__mem())
