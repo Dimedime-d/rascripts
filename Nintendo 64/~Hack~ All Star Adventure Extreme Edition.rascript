@@ -1,5 +1,6 @@
 // ~Hack~ All Star Adventure: Extreme Edition
 // #ID = 11581
+// Made in RATools v1.10.2
 
 // ------------- //
 //   u t i l s   //
@@ -59,6 +60,7 @@ mario__struct = {
     "y":                  0x40,  // dword (float)
     "z":                  0x44,  // dword (float)
     "interaction object": 0x78,  // dword (pointer to object)
+    "mario object":       0x88,  // dword (pointer to object)
     "nof stars (hud)":    0xa8,  // word
     "hp":                 0xac,  // byte / word
     "hp inc":             0xb0,  // byte
@@ -77,6 +79,8 @@ function wearing_vanish_cap() => bit1(mario_field("hat bitflags"))
 function pos_x() => dword(mario_field("x"))
 function pos_y() => dword(mario_field("y"))
 function pos_z() => dword(mario_field("z"))
+
+function mario_object() => tbyte(mario_field("mario object"))
 
 function hp_int() => byte(mario_field("hp") + 1)
 function hp_dec() => byte(mario_field("hp dec"))
@@ -240,12 +244,16 @@ object__sizeof = 0x260
 behaviour_script__values = {
     "secret star spawner":    0x800ef05c,
     "file select background": 0x8008fcf0,
+    
+    "secret":                 0x8011C3DC,
+    "red coin":               0x8011C36C,
 }
 
 function object_is_active(addr) => word(object_field(addr, "active")) == 0x0101
 function object_was_active(addr) => prev(word(object_field(addr, "active"))) == 0x0101
 function object_just_deactivated(addr) => object_was_active(addr) && !object_active(addr)
 
+function object_behav_script(addr) => dword(object_field(addr, "behaviour script"))
 function object_is(addr, name) => dword(object_field(addr, "behaviour script")) == behaviour_script__values[name]
 
 function object_num_collided_objects(addr) => word(object_field(addr, "num collided objects"))
@@ -254,8 +262,38 @@ function object_nth_collided_object(addr, n) => tbyte(object_field(addr, format(
 // object specific
 function object_spawner_num_secrets(addr)  => dword(object_field(addr, "spawner num secrets"))
 
+function mario_collision_check(obj_addr, obj_name, nth_collided) {
+    return object_num_collided_objects(mario_object()) >= nth_collided
+            && (
+                (obj_addr != prev(obj_addr)) 
+                || (object_behav_script(obj_addr) != prev(object_behav_script(obj_addr)))
+                || (object_num_collided_objects(mario_object()) != prev(object_num_collided_objects(mario_object())))
+               )
+            && object_is(obj_addr, obj_name)
+}
+
+// field_checks is a dict of the form {object field, field value}
+function collided_with_object(obj_name, count=1, field_checks={}, extra_logic=always_true()) {
+    obj_tally = []
+    for i in range(1,4) {
+        obj_addr = object_nth_collided_object(mario_object(), i)
+        
+        coll_check = mario_collision_check(obj_addr, obj_name, i)
+        
+        if (length(field_checks) > 0)
+            for field in field_checks {
+                coll_check = coll_check && check_object_field(obj_addr, field, field_checks[field])
+            }
+        
+        coll_check = coll_check && extra_logic
+        array_push(obj_tally,
+            repeated(count, coll_check))   
+    }
+    return tally(count, obj_tally)
+}
+
 object_indexes = {
-    "Course 2":  { "Secret Star Spawner": 37},
+    "Course 2":  { "Secret Star Spawner": 35},
 }
 
 // --------------------------- //
@@ -284,7 +322,7 @@ function array_object_king_whomp_attacking(index) => object_king_whomp_attacking
 function array_object_spawner_num_secrets(index)  => object_spawner_num_secrets(nth_array_object(index))
 
 object_indexes = {
-    "Course 2": { "Secret Star Spawner": 36 },
+    "Course 2": { "Secret Star Spawner": 35 },
 }
 
 function in_game() {
@@ -360,9 +398,9 @@ achievement(
 function stars_meta(points, ids, badge_ids) => { "points": points, "ids": ids, "badge_ids": badge_ids }
 
 course_stars_meta = {
-    "Course 1":  stars_meta([ 10,  4,  4,  5, 10,  5,  5], range(179568, 179574), range(199952, 199958)),
+    "Course 1":  stars_meta([ 10,  4,  4,  10, 10,  5,  10], range(179568, 179574), range(199952, 199958)),
     "Course 2":  stars_meta([  4,  4,  4,  3, 10,  3],     range(179575, 179580), range(199959, 199964)),
-    "Course 3":  stars_meta([  4,  4,  2, 10, 10, 10, 10], range(179581, 179587), range(199965, 199971)),
+    "Course 3":  stars_meta([  4,  5,  2, 10, 10, 10, 10], range(179581, 179587), range(199965, 199971)),
     "Course 4":  stars_meta([  5, 10, 10,  4, 25],         range(179588, 179592), range(199972, 199976)),
     "Course 5":  stars_meta([  5, 10, 10, 25, 25, 10, 25], range(179593, 179599), range(199977, 199983)),
     "Course 6":  stars_meta([  4,  5,  5,  5, 10],         range(179600, 179604), range(199984, 199988)),
@@ -396,7 +434,7 @@ function course_stars_achievements() {
             trigger = just_collected_star(course_key, star_index)
             if (course_index == 2 && star_index < 6){
                 description = description + " (No Wing Cap)"
-                trigger = trigger && disable_when(wearing_wing_cap() == 1, until = !in_level(course_key))
+                trigger = unless(once(wearing_wing_cap() == 1 && never(!in_level(course_key))))  && trigger
             }
             
             id = course_stars_meta[course_key]["ids"][star_index - 1]
@@ -521,19 +559,15 @@ achievement(
 
 function wing_cap_tour_trigger()
 {
-    spawner = object_indexes["Course 2"]["Secret Star Spawner"]
     return never(!in_level("Course 2")) 
     
     && once(mario_anim_is("airborne spawn") && mission_id__mem == 5)
     
+    && collided_with_object("secret")
+    && collided_with_object("red coin", 8)
+    
     && trigger_when(
-        once(array_object_is(spawner, "secret star spawner")
-        && array_object_is_active(spawner)
-        && just_changed(array_object_spawner_num_secrets(spawner), 4, 5))
-        
-        && (repeated(8, coins__mem == prev(coins__mem) + 2))
-        
-        && just_collected_star_plain(6)
+        just_collected_star_plain(6)
     )
 }
 
@@ -693,7 +727,7 @@ level__lookup = rich_presence_lookup("LevelAction", level_id__mem, {
 }, "in an unbeknownst location")
 
 stars__value = rich_presence_value("Number", nof_stars())
-deaths__value = rich_presence_value("Number", measured(mario_anim_changed_to("death respawn")))
+deaths__value = rich_presence_value("Number", measured(mario_anim_changed_to("death respawn"))) // screw you compiler, I do what I want
 
 rich_presence_conditional_display(
     in_game(),
@@ -708,15 +742,15 @@ rich_presence_display("Mario is getting ready for another extreme adventure")
 // && pos_y() > 0x45C90000 && pos_y() < 0x45D80000
 // && pos_z() > 0xC5C00000 && pos_z() < 0xC5D10000
 
-// scrap this lol
-leaderboard(title = "Yellow Switch Speedrun", description = "In Desolated Outlet, stand on the yellow !-switch as fast as possible",
-    start = just_entered_level_from("Bowser Course", "Overworld"), cancel = !in_level("Bowser Course"), 
-    submit = !airborne() && pos_x() > 0xC5A80000 && pos_x() < 0xC5BB0000
-        && pos_y() > 0x45C90000 && pos_y() < 0x45D80000
-        && pos_z() > 0xC5C00000 && pos_z() < 0xC5D10000, value = measured(in_level("Bowser Course")), format = "FRAMES")
-        
-//achievement(title="DUMMY", description="Yellow switch check", points=0, trigger=in_level("Bowser Course") && !airborne() && pos_x() > 0xC5A80000 && pos_x() < 0xC5BB0000 && pos_y() > 0x45C90000 && pos_y() < 0x45D80000 && pos_z() > 0xC5C00000 && pos_z() < 0xC5D10000)
-
-leaderboard(title = "King Whomp Beatdown", description = "Enter Desolated Outlet and defeat King Whomp as fast as possible",
-    start = just_entered_level_from("Bowser Course", "Overworld"), cancel = in_level("Overworld"),
-    submit = whomp_star_collect_trigger(), value = measured(in_level("Bowser Course") || in_level("Boss Battle")), format = "FRAMES")
+//// scrap this lol
+//leaderboard(title = "Yellow Switch Speedrun", description = "In Desolated Outlet, stand on the yellow !-switch as fast as possible",
+//    start = just_entered_level_from("Bowser Course", "Overworld"), cancel = !in_level("Bowser Course"), 
+//    submit = !airborne() && pos_x() > 0xC5A80000 && pos_x() < 0xC5BB0000
+//        && pos_y() > 0x45C90000 && pos_y() < 0x45D80000
+//        && pos_z() > 0xC5C00000 && pos_z() < 0xC5D10000, value = measured(in_level("Bowser Course")), format = "FRAMES")
+//        
+////achievement(title="DUMMY", description="Yellow switch check", points=0, trigger=in_level("Bowser Course") && !airborne() && pos_x() > 0xC5A80000 && pos_x() < 0xC5BB0000 && pos_y() > 0x45C90000 && pos_y() < 0x45D80000 && pos_z() > 0xC5C00000 && pos_z() < 0xC5D10000)
+//
+//leaderboard(title = "King Whomp Beatdown", description = "Enter Desolated Outlet and defeat King Whomp as fast as possible",
+//    start = just_entered_level_from("Bowser Course", "Overworld"), cancel = in_level("Overworld"),
+//    submit = whomp_star_collect_trigger(), value = measured(in_level("Bowser Course") || in_level("Boss Battle")), format = "FRAMES")
