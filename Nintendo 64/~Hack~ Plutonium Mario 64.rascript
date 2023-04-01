@@ -364,6 +364,7 @@ function object_behavior_check(addr, check, delta=0) {
 
 function object_is(addr, name) => object_behavior_check(addr, object_behavior_checks[name], delta=0)
 function object_was(addr, name) => object_behavior_check(addr, object_behavior_checks[name], delta=1)
+function object_changed_to(addr, name) => !object_was(addr, name) && object_is(addr, name)
 
 function object_num_collided_objects(addr) => word(object_field(addr, "num collided objects"))
 function object_nth_collided_object(addr, n) => tbyte(object_field(addr, format("collided object {0}", n)))
@@ -1244,12 +1245,10 @@ achievement(
 
 achievement(
     title = "Really Don't Need This",
-    description = "Rocky Reservoir - Collect the star behind the highest door without pressing the purple switch.",
+    description = "Rocky Reservoir - Collect the star behind the highest door without standing on the purple switch.",
     points = 2,
     trigger = remained_in_level("Metal Cap")
-        && never(object_is(stood_on_object(), "purple box switch")
-            && object_action(stood_on_object()) == 1)
-            // purple switch - action 1 = being pressed
+        && never(object_changed_to(stood_on_object(), "purple box switch"))
         && just_collected_star(star_index = 6, trigger = 1),
     id = 213240,
     badge = "235522"
@@ -1282,11 +1281,10 @@ achievement(
 
 achievement(
     title = "Another Skippable Switch",
-    description = "Rusty Pits - Collect the key without pressing the purple switch (re-enter the 2nd area to try again).",
+    description = "Rusty Pits - Collect the key without standing on the purple switch (re-enter the 2nd area to try again).",
     points = 5,
     trigger = remained_in_level("Key 2")
-        && never(object_is(stood_on_object(), "purple box switch")
-            && object_action(stood_on_object()) == 1)
+        && never(object_changed_to(stood_on_object(), "purple box switch"))
         && just_collected_star(trigger = 1),
     id = 213243,
     badge = "235525"

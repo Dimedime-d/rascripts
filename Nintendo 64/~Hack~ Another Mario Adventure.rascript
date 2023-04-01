@@ -327,6 +327,7 @@ function object_just_deactivated(addr) => prev(object_active(addr)) != 0 && obje
 function object_behav_script(addr) => dword(object_field(addr, "behaviour script"))
 function object_is(addr, name) => object_behav_script(addr) == behaviour_script__values[name]
 function object_was(addr, name) => prev(object_behav_script(addr)) == behaviour_script__values[name]
+function object_changed_to(addr, name) => !object_was(addr, name) && object_is(addr, name)
 
 function object_num_collided_objects(addr) => word(object_field(addr, "num collided objects"))
 function object_nth_collided_object(addr, n) => tbyte(object_field(addr, format("collided object {0}", n)))
@@ -973,12 +974,11 @@ for dat in mushie_infos {
 
 achievement(
     title = "Another Adventure, Another Pointless Switch",
-    description = "Course 1 - Collect the star 'Wooded Secrets Platforming' without pressing the purple switch.",
+    description = "Course 1 - Collect the star 'Wooded Secrets Platforming' without standing on the purple switch.",
     points = 2,
     trigger = remained_in_level("Course 1")
         && sublevel_id__mem == 1
-        && never(object_is(stood_on_object(), "purple box switch")
-            && object_action(stood_on_object()) == 1)
+        && never(object_changed_to(stood_on_object(), "purple box switch"))
         && trigger_when(collecting_star_object("spawned star", 1)),
     id=237268,
     badge="263351"
@@ -1412,12 +1412,11 @@ achievement(
 
 achievement(
     title = "Not Really a Speedrun nor Water",
-    description = "Guest Course 5 - Collect the star 'A Speedrun Over the Water without pressing the purple switch.",
+    description = "Guest Course 5 - Collect the star 'A Speedrun Over the Water without standing on the purple switch.",
     points = 3,
     trigger = remained_in_level("Guest Course 5")
         && sublevel_id__mem == 1
-        && never(object_is(stood_on_object(), "purple box switch")
-            && object_action(stood_on_object()) == 1)
+        && never(object_changed_to(stood_on_object(), "purple box switch"))
         && trigger_when(collecting_star_object("regular star", 0)),
     id=237281,
     badge="263364"

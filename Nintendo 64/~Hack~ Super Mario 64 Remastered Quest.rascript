@@ -1122,12 +1122,11 @@ achievement(
 
 achievement(
     title = "Just Fly Right In",
-    description = "Shifting Sands Mirage - Collect the star 'Switch Box in the Tox' without pressing the purple switch.",
+    description = "Shifting Sands Mirage - Collect the star 'Switch Box in the Tox' without standing on the purple switch.",
     points = 5,
     trigger = remained_in_level("Course 8")
         && sublevel_id__mem == 1
-        && never(object_is(stood_on_object(), "purple box switch")
-            && object_action(stood_on_object()) == 1)
+        && never(object_changed_to(stood_on_object(), "purple box switch"))
         && trigger_when(collecting_star_object("regular star", 1)),
     id = 244852,
     badge = "271679"
