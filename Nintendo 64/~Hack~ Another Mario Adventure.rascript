@@ -210,6 +210,7 @@ mario_previous_action__mem = dword(mario_field("previous action"))
 
 mario_action__values = {
     "uninitialized":               0x00000000,
+    "disappeared":                 0x00001300,
     "star dance ground (exit)":    0x00001302,
     "star dance water":            0x00001303,
     "star dance ground (no exit)": 0x00001307,
@@ -465,10 +466,11 @@ function collecting_star_object(obj_name, mission) {
 
 // tkt 50250 - add a delta for obj != teleporter to prevent popping during level transition
 // note: interaction object is cleared upon switching screens (generally set to Mario Spawn / Pipe)
+// tkt 59625 - delta interact object is UNSAFE because other objects can load between transitions. use delta action check so that the logic is still true for only a single frame (when you start teleporting)
 function just_used_teleporter(id) {
     obj = interaction_object()
     return obj != 0
-        && !object_was(obj, "teleporter")
+        && mario_action_changed_to("start teleporting")
         && object_is(obj, "teleporter")
         && object_teleporter_id(obj) == id
 }
@@ -1017,7 +1019,7 @@ achievement(
 
 achievement(
     title = "Good Old Tower Climbing",
-    description = "Enter the other Course 4 entrance in the overworld without getting a wing cap (enter any level or switch day/night to reset).",
+    description = "Enter the other Course 4 entrance in the overworld without getting a wing cap (enter any level or switch day/night to retry).",
     points = 5,
     trigger = in_level("Overworld 1")
         && disable_when(just_increased(wearing_wing_cap()), until=screen_changed())

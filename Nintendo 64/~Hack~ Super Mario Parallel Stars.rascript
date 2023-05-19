@@ -1,6 +1,6 @@
 // ~Hack~ Super Mario Parallel Stars
 // #ID = 20594
-// Made in RATools v1.9.1
+// Made in RATools v1.9.1 -> v1.12.0
 
 // ------------- //
 //   u t i l s   //
@@ -546,10 +546,11 @@ function collecting_star_object(obj_name, mission) {
 // note: interaction object is cleared upon switching screens (generally set to Mario Spawn / Pipe)
 
 // yeah, this also pops if you're teleporting from the warp, don't worry about 3-way warps, for now...
+// tkt 59625 - delta interact object is UNSAFE because other objects can load between transitions. use delta action check so that the logic is still true for only a single frame (when you start teleporting)
 function just_used_teleporter(id) {
     obj = interaction_object()
     return obj != 0
-        && just_changed_any(obj)
+        && mario_action_changed_to("start teleporting")
         && object_is(obj, "teleporter")
         && object_teleporter_id(obj) == id
 }
@@ -769,8 +770,8 @@ function common_in_file_check() => !in_intro_or_file_select() && level_id__mem !
 
 // switches
 function rgb_trigger() {
-    sum_switches_now = sum_of(["red", "green", "blue"], a => pressed_switch(a, delta=0))
-    sum_switches_del = sum_of(["red", "green", "blue"], a => pressed_switch(a, delta=1))
+    sum_switches_now = sum_of(["red", "green", "blue"], a => pressed_switch__mem(a, delta=0))
+    sum_switches_del = sum_of(["red", "green", "blue"], a => pressed_switch__mem(a, delta=1))
     
     return level_id__mem == prev(level_id__mem) // to prevent switching files after the ending picture puts you back to the title screen...
     && file_num__mem == prev(file_num__mem)

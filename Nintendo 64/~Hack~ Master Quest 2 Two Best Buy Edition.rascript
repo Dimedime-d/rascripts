@@ -1,6 +1,6 @@
 // ~Hack~ Master Quest 2 Two: Best Buy Edition
 // #ID = 24007
-// Made in RATools 1.11.0
+// Made in RATools 1.11.0 -> v1.12.0
 
 // ------------- //
 //   u t i l s   //
@@ -228,6 +228,7 @@ mario_previous_action__mem = dword(mario_field("previous action"))
 
 mario_action__values = {
     "uninitialized":               0x00000000,
+    "disappeared":                 0x00001300,
     "star dance ground (exit)":    0x00001302,
     "star dance water":            0x00001303,
     "star dance ground (no exit)": 0x00001307,
@@ -482,16 +483,14 @@ function collecting_star_object(obj_name, mission) {
 
 function just_used_warp(id) {
     obj = interaction_object()
-    return obj != 0
-        && just_changed_any(obj)
+    return mario_action_changed_to("disappeared")
         && object_is(obj, "warp")
         && object_warp_dest(obj) == id
 }
 
 function just_used_pipe(id) {
     obj = interaction_object()
-    return obj != 0
-        && just_changed_any(obj)
+    return mario_action_changed_to("disappeared")
         && object_is(obj, "warp pipe")
         && object_warp_dest(obj) == id
 }
@@ -1288,7 +1287,7 @@ got_one_red = nof_coins() == prev(nof_coins()) + 2
 
 achievement(
     title = "Easy Shell Smuggle",
-    description = "Collect 7 red coins in Course 14 while riding a koopa shell in one go.",
+    description = "Collect 7 red coins in Course 14 while riding a Koopa Shell in one go.",
     points = 5,
     trigger = never(level_changed()) && !object_is(nth_array_object(0), "mission star manager")
         && never(object_just_deactivated(ridden_object()))
