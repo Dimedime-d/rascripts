@@ -941,7 +941,7 @@ function milestone_meta(title, description, stars, points, id=0, badge="0") => {
 milestones = [
     milestone_meta("Small Needle Collection",
         "Collect 13 stars.",
-        stars=13, points=3, id=322079, badge="359107"),
+        stars=13, points=5, id=322079, badge="359107"),
     milestone_meta("Freezing Sanctuary",
         "Collect 40 stars.",
         stars=40, points=5, id=322080, badge="359108"),
@@ -1059,8 +1059,8 @@ course_offsets = [
     course_stars_meta("Course 6", sum_star_bits(0x12, range(0, 5)), 10, "Miss the Ultra Blocks?", id=322094, badge="359122"),
     course_stars_meta("Course 7", sum_star_bits(0x11, range(0, 5)), 10, "Mortal Blood Enveloped by the Snowfall of Purification", id=322095, badge="359123"),
     course_stars_meta("Course 8", sum_star_bits(0x10, range(0, 5)), 10, "Needs More Deadly Gas", id=322096, badge="359124"),
-    course_stars_meta("Course 9", sum_star_bits(0x17, range(0, 5)), 10, "Not-So Cancerous Design Castle", id=322097, badge="359125"),
-    course_stars_meta("Course 10", sum_star_bits(0x16, range(0, 5)), 10, "Stupid Construction Workers Dug Out the Ground", id=322098, badge="359126"),
+    course_stars_meta("Course 9", sum_star_bits(0x17, range(0, 5)), 25, "Not-So Cancerous Design Castle", id=322097, badge="359125"),
+    course_stars_meta("Course 10", sum_star_bits(0x16, range(0, 5)), 25, "Stupid Construction Workers Dug Out the Ground", id=322098, badge="359126"),
     course_stars_meta("Course 11", sum_star_bits(0x15, range(0, 5)), 25, "Warmed, Warned Cliffs", id=322099, badge="359127"),
     course_stars_meta("Course 12", sum_star_bits(0x14, range(0, 5)), 25, "Blaze Craze Parkour", id=322100, badge="359128"),
     course_stars_meta("Course 13", sum_star_bits(0x1b, range(0, 5)), 25, "Old Music Was Better", id=322101, badge="359129"),
@@ -1280,7 +1280,7 @@ mushies_data = [
          {"type": "stationary", "count": 1}],
         level_check=remained_in_level("Course 6", hit=0) && sublevel_id__mem == 1, id=322447, badge="359591"),
     mushies_meta("Course 7", "A Feast You Shall Receive",
-        "Collect all 7 life shrooms in {0}. Yes, 7.", 3,
+        "Collect all 7 life shrooms in {0}. Yes, 7.", 4,
         [{"type": "stationary", "count": 7}],
         level_check=remained_in_level("Course 7", hit=0), id=322448, badge="359592"),
     // skip c9
@@ -1401,7 +1401,7 @@ function challenge_achievements_1() {
     // reset no longer activates over trigger condition
     achievement(
         title = "In-n-Out Vanish Time",
-        description = "Collect the secret and the star 'Top Tiny Parkour' in Course 2 while wearing your vanish cap, in one go.",
+        description = "Collect the secret and the star 'Top Tiny Parkour' in Course 2 while wearing a vanish cap, in one go.",
         points = 5,
         trigger = remained_in_level("Course 2", hit=0)
             && once(object_changed_to(g_cutscene_focus__mem, "spawned star")
@@ -1645,7 +1645,7 @@ function challenge_achievements_2() {
     
     achievement(
         title = "Whynut Go the Intended Path?",
-        description = "Collect the star 'Whynut at the Darknut Ruins?' in Course 7, wallkicking no more than two times. (Must enter from C6/death re-entry)",
+        description = "Collect the star 'Whynut at the Darknut Ruins?' in Course 7, wallkicking no more than two times. (Must enter from C6 spot)",
         points = 10,
         trigger = remained_in_level_from_warp("Course 7", 0x0A)
         && ((trigger_when(collected_star_action_check(4)) && disable_when(repeated(3, wallkicked())))
@@ -1788,7 +1788,7 @@ function challenge_achievements_2() {
     // cp-less
     achievement(
         title = "Good End Bully World",
-        description = "Complete the first part of Beautiful Skyscape without respawning at a checkpoint. (Go to black pipe to remove checkpoint)",
+        description = "Complete the first part of Beautiful Skyscape (use end warp) without respawning at a checkpoint. (Go to black pipe to remove checkpoint)",
         points = 10,
         trigger = remained_in_level_no_checkpoint("Bowser 1", warp=0x0A)
             && trigger_when(just_used_teleporter(0x12)),
@@ -1798,7 +1798,7 @@ function challenge_achievements_2() {
     
     achievement(
         title = "Permafrost Parkour",
-        description = "Get to the end of Frozen Dizzy Plant without respawning at a checkpoint OR taking damage. (Go to door in C6 to remove checkpoint)",
+        description = "Complete the first part of Frozen Dizzy Plant (use end warp) without respawning at a checkpoint OR taking damage. (Go to door in C6 to remove checkpoint)",
         points = 25,
         trigger = remained_in_level_no_checkpoint("Bowser 2", warp=0x0A)
             && never(just_increased(hp_decrement()))
@@ -1821,7 +1821,7 @@ function challenge_achievements_2() {
     
     achievement(
         title = "Actual Checkpointless God",
-        description = "Get to the end of Devour Realm without respawning at a checkpoint. (Must reset game to remove checkpoint)",
+        description = "Complete the Devour Realm (get star) without respawning at a checkpoint. (Must reset game to remove checkpoint)",
         points = 50,
         trigger = remained_in_level_no_checkpoint("Devour Realm")
             && trigger_when(collected_star_action_check()),
