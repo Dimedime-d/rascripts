@@ -1398,6 +1398,7 @@ function challenge_achievements_1() {
         badge="359608"
     )
     
+    // reset no longer activates over trigger condition
     achievement(
         title = "In-n-Out Vanish Time",
         description = "Collect the secret and the star 'Top Tiny Parkour' in Course 2 while wearing your vanish cap, in one go.",
@@ -1406,7 +1407,7 @@ function challenge_achievements_1() {
             && once(object_changed_to(g_cutscene_focus__mem, "spawned star")
                 && object_star_mission(g_cutscene_focus__mem) == 3
                 && wearing_vanish_cap() != 0)
-            && never(just_decreased(wearing_vanish_cap()))
+            && never(just_decreased(wearing_vanish_cap()) && !mario_action_is("star grab fall"))
             && trigger_when(collected_star_action_check(4)),
         id=322465,
         badge="359609"
@@ -1448,7 +1449,7 @@ function challenge_achievements_1() {
     
     achievement(
         title = "Do It",
-        description = "Complete the sign challenge in Course 6. (all 8 reds, no yellow coins, >=5 HP in the cold pipe)",
+        description = "Complete the sign challenge in Course 6. (all 8 reds + star, no yellow coins, >=5 HP in the cold pipe)",
         points = 10,
         trigger = in_area("Course 6", 2) && disable_when(nof_coins() == (prev(nof_coins()) + 1)) && disable_when(hp() < 0x500 && prev(hp()) >= 0x500)
             && (trigger_when(repeated(8, got_red_coin())) && (trigger_when(collected_star_action_check(4))))
@@ -1669,9 +1670,10 @@ function challenge_achievements_2() {
         description = "Collect all 8 red coins and the star in Course 9 without using any warp.",
         points = 10,
         trigger = sublevel_id__mem == 1
-            && disable_when(mario_action_changed_to("start teleporting"), until=level_changed())
+            && !object_is(nth_array_object(0), "mission star manager")
+            && ((disable_when(mario_action_changed_to("start teleporting"))
             && measured(repeated(8, got_red_coin()), when=in_level("Course 9"))
-            && trigger_when(collected_star_action_check(3)),
+            && trigger_when(collected_star_action_check(3))) || (never(level_changed()) && impossible_condition())),
         id=322489,
         badge="359633"
     )
@@ -1860,7 +1862,7 @@ function challenge_achievements_2() {
         title = "Nontrivial Path",
         description = "In Course 5, touch the sign that tells you to wallkick up to the yellow coin, then do as it says. (Must land on the side with the coin)",
         points = 5,
-        trigger = in_level("Course 5")
+        trigger = remained_in_level("Course 5", hit=0)
             && once(object_num_collided_objects(mario_object()) >= 1
                 && object_is(object_nth_collided_object(mario_object(), 1), "sign")
                 && object_beh_param_2(object_nth_collided_object(mario_object(), 1)) == 0x1E)
