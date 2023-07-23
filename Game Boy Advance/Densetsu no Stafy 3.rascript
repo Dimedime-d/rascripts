@@ -493,7 +493,7 @@ for i in bosses {
 
 // Extra Tasks
 
-function reached_goal() => just_increased(character_collision_bits["Goal Movement Lock"]) && just_increased(character_collision_bits["No Enemy Collision"])
+function reached_goal() => just_increased(character_collision_bits["Goal Movement Lock"]) && just_increased(character_collision_bits["No Enemy Collision"]) && just_increased(bit(0, 0x7838)) // magic bitflags, woohoo
 
 function area_start(stage, area) => game_state_just_changed("Area Select", "Play Area") && in_room(stage, area, 1)
 
@@ -536,10 +536,9 @@ achievement(
     title = "The Best Treasure Hunting Tag Team",
     description = "Revisit Stage 8-4 and collect all 216 naturally appearing big or small pearls.",
     points = 10,
-    trigger = in_room(18, 4)
-        && prev(all_collected_pearls_sum(15)) < 216
+    trigger = prev(all_collected_pearls_sum(15)) < 216
         && prev(all_collected_pearls_sum(15)) >= 210
-        && measured(all_collected_pearls_sum(15) == 216)
+        && measured(all_collected_pearls_sum(15) == 216, when=in_room(18, 4))
 )
 
 achievement(
