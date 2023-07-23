@@ -1620,7 +1620,7 @@ function challenge_achievements_2() {
     
     achievement(
         title = "Having None of Puce",
-        description = "Collect the star 'A Pinky Exploration' in Course 5 without taking damage.",
+        description = "Collect the star 'A Pinky Expedition' in Course 5 without taking damage.",
         points = 5,
         trigger = remained_in_level("Course 5", hit=1)
             && never(just_increased(hp_decrement()))

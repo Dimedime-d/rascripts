@@ -935,19 +935,19 @@ course_star_cheev_titles = [
 course_star_titles = {
     "Course 1": ["Warm Up Inside the House", "Spam Your Way Up the Crevice", "Momentum Boxes", "The Gate Key is on the Roof", "The Impossible Slope", "Red Parkour in the Blue Valley"],
     "Course 2": ["Wooden Structure in the Cavern", "High in the Cavern", "Isolated Crevice", "Far Down Triple Jump", "Penguin Push", "Easier Preparation for Overwintering"],
-    "Course 3": ["Top of the Castle?", "Parkour of the Chopped Tee", "A Poisonous Path", "Curious Ruins", "Prehistoric Tour", "Archaic Bunker"],
+    "Course 3": ["Top of the Castle?", "Parkour of the Chopped Tree", "A Poisonous Path", "Curious Ruins", "Prehistoric Tour", "Archaic Bunker"],
     "Course 4": ["Simple Blocky Tower", "Tall Poison Chair", "Timed Boxes Below", "Eye to Eye in the Secret Alcove", "Red Change in the Furniture Cushions", "Way Too Parkour for C4?"],
     "Course 5": ["Tour of the Magma Cave", "Lava Staircase", "BLJ to the Stone Podium", "Burning Dirt Path", "Secrets of the High Area", "Unearthed Red Gems"],
     "Course 6": ["Treacherous Sliding Cave", "Triple Jump Groundpound Challenge", "Unconventional !-Box Breaking", "Hot Coins of the Boiling Water Cave", "Secrets Around the Strange Building", "Top of the Boiling Water Cave"],
     "Course 7": ["Observation Tower of the Heavens", "Behind the House", "Within Fertile Ground", "Path of the Rings", "Red Coins of the Sky's Courtyard", "Beneath the Clouds"],
     "Course 8": ["Erupting Secrets", "Timed Bully Battle", "Lava Cube Parkour", "Spicier Red Coins", "Atop the Lavafall", "Punishing Precise Parkour"],
     "Course 9": ["Shining Secrets of the Marshy Pit", "Top of the Factory Ruins", "Tunnel Navigation With a Shell", "Down the Drain", "Tunnel Navigation With Wallkicks", "Red Coin Exploration"],
-    "Course 10": ["Smaller Bob-ombs Are Stronger", "Recrudescence of the Fortress", "Hailstorm Tower's Flipside", "Not-so-Toxic Shroomland", "Logo Logistics", "Sentimental Inclination"],
+    "Course 10": ["Smaller Bob-ombs Are Stronger", "Recrudescence of the Fortress", "Hailstorm Tower's Flipside", "Not So Toxic Shroomland", "Logo Logistics", "Sentimental Inclination"],
     "Course 11": ["Across Rusted Bolts", "Hidden Biohazard Room", "Slippery Flooded Secrets", "Atop the Radioactive Mound", "The Battle of Geeheeb", "The Underground Switch"],
     "Course 12": ["Overlooking the Rainscape", "Into the Lava Chamber", "Sliding Around for Secrets", "Tunnel to the Impossible Box", "Unstable Wooden Crossovers", "Special Red Raindrops"],
     "Course 13": ["Purgatory Afterglow", "Subterranean Cap Combo", "Deadly Rooftop", "Around the Subterranean Complex", "The Fortified Tower's Top", "Edge of Sanity"],
-    "Course 14": ["Atop Sky Blue Tower's Waterfall", "Silver Detour's Wallkick Challenge", "Don't Venture Far for Secrets", "Purple Tower's Perilous Parkour", "Storm the Big Red Building", "Raid the Golden Treasure Chest"],
-    "Course 15": ["Brutal Wallkick Excursion", "Panels of the Mossy Slope", "Find the Metal Cap", "Treasure Under the Ruins", "The Impossible Alcove", "Gauntlet of Hope and Despair"],
+    "Course 14": ["Atop Sky Blue Tower's Waterfall", "Silver Detour's Wallkick Challenge", "Don't Venture Far for Secrets", "Purple Path's Perilous Parkour", "Storm the Big Red Building", "Raid the Golden Treasure Chest"],
+    "Course 15": ["Brutal Wallkick Excursion", "Panels of the Mossy Lava Slope", "Find the Metal Cap", "Treasure Under the Ruins", "The Impossible Alcove", "Gauntlet of Hope and Despair"],
 }
 
 function is_numbered_course(title) {
@@ -990,7 +990,7 @@ course_stars_meta = {
     "End Cake Picture": stars_meta([10, 10, 10, 10, 4, 5], ids=sequence(322376, 6), badge_ids=sequence(359520, 6, badge=1)), // GG
     "Clouds":    stars_meta([5, 5, 5, 10, 10, 10], ids=sequence(322382, 6), badge_ids=sequence(359526, 6, badge=1)), // CC
     
-    "Castle Grounds": stars_meta([-1, -1, -1, 3, 5], ids=[-1, -1, -1, 322389, 322388], badge_ids=["", "", "", "359533", "359322"]),
+    "Castle Grounds": stars_meta([-1, -1, -1, 3, 5], ids=[-1, -1, -1, 322389, 322388], badge_ids=["", "", "", "359533", "359532"]),
     "Inside Castle":  stars_meta([1, 3, 5], ids=[322390, 322391, 322392], badge_ids=["359534", "359535", "359536"]),
     "Castle Courtyard": stars_meta([-1, -1, -1, -1, -1, 4, 10],  ids=[-1, -1, -1, -1, -1, 322393, 322394], badge_ids=["", "", "", "", "", "359537", "359538"]),
 }
@@ -1196,8 +1196,8 @@ function challenge_achievements() {
         title = "Pretend There Are Extra Grates",
         description = "Collect 3 secrets in Course 6 while wearing a vanish cap (does not have to be in one go).",
         points = 10,
-        trigger = remained_in_level("Course 6", hit=0)
-            && measured(collided_with_object("secret number", count=3, extra_logic=wearing_vanish_cap() != 0)),
+        trigger = never(level_changed())
+            && measured(collided_with_object("secret number", count=3, extra_logic=wearing_vanish_cap() != 0), when=in_level("Course 6")),
         id=322416,
         badge="359560"
     )
@@ -1266,7 +1266,7 @@ function challenge_achievements() {
     
     achievement(
         title = "I Don't Miss the Fire Spam",
-        description = "Collect the star 'Not-so-Toxic Shroomland' in Course 10 without taking damage.",
+        description = "Collect the star 'Not So Toxic Shroomland' in Course 10 without taking damage.",
         points = 25,
         trigger = remained_in_level("Course 10", hit=1)
             && never(just_increased(hp_decrement()))
@@ -1280,7 +1280,7 @@ function challenge_achievements() {
     
     kbr2_signs = [
         kbr2_sign_meta(0x00, "Fun Fact: SM64 Hack ROMs are Mostly Empty Space, Usually (1/4)", "beneath a fake floor", 322423, "359567"),
-        kbr2_sign_meta(0x02, "KBR1 Flashbacks (2/4)", "along the toxic outskirts", 322424, "359568"),
+        kbr2_sign_meta(0x02, "KBR1 Flashbacks (2/4)", "along the shroomland outskirts", 322424, "359568"),
         kbr2_sign_meta(0x03, "The Greatest C15 of All Time (3/4)", "on a sizzling lava bath", 322425, "359569"),
         kbr2_sign_meta(0x34, "No Shade to Skelux, But... (4/4)", "behind a nocturnal fortress", 322426, "359570")
     ]
