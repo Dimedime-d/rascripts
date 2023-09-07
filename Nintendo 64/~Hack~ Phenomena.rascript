@@ -1265,7 +1265,7 @@ achievement(
 
 achievement(
     title = "Flotation in Nothing Form",
-    description = "Collect the star 'Icy Athletics on the Third Floor' in Course 7 without standing on the purple switch.",
+    description = "Collect the star 'Icy Athletics on the Third Floor' in Course 7 without standing on the purple switches.",
     points = 5,
     trigger = remained_in_level("Course 7", hit=1)
         && sublevel_id__mem == 1
