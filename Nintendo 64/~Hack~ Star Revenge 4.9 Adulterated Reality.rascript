@@ -1311,7 +1311,7 @@ mushies_data = [
     mushies_meta("Castle Grounds", "Memories of a Rewritten Past",
         "Collect both life shrooms in {0}. Can you even take damage here?", 2,
         [{"type": "stationary", "count": 2}],
-        level_check=__ornext(any_of([0, 0x10], a => warp_dest_level() == a)) && __ornext(any_of([0, 1], a => warp_dest_area() == a)) && never(object_changed_to(nth_array_object(0), "mission star manager"))  && never(just_changed_to(level_id__mem, 6)), id=322455, badge="359599"),
+        level_check=__ornext(any_of([0, 0x10], a => warp_dest_level() == a)) && __ornext(any_of([0, 1], a => warp_dest_area() == a)) && never(just_changed_from(level_id__mem, 0x10)), id=322455, badge="359599"),
     // ocean temple, devour realm are gimmes
     
     mushies_meta("Bowser 1", "Cloudy Shrooms",
