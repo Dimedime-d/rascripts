@@ -8,8 +8,10 @@
 
 function is_float_neg(mem) => mem > 0x80000000
 
+function just_changed_any(mem) => mem != prev(mem)
 function just_changed(mem, from, to) => prev(mem) == from && mem == to
 function just_changed_to(mem, to) => prev(mem) != to && mem == to
+function just_changed_from(mem, from) => prev(mem) == from && mem != from
 
 function struct_field(struct_def, base, field) => base + struct_def[field]
 
@@ -30,6 +32,8 @@ mario_anim__values = {
     "airborne spawn":              0x00001924,
     "death respawn":               0x00001929,
     "lava boost":                  0x010208B7,
+    
+    "long jump":                   0x03000888, // slow or faste
 }
 
 function mario_anim_is(name) => mario_anim__mem == mario_anim__values[name]
@@ -50,6 +54,8 @@ controller_input__addr = 0x367057
 
 function controller_b_button() => bit6(controller_input__addr)
 
+function swimming() => bit(5, mario_anim__addr + 1)
+
 // ------------- //
 //   m a r i o   //
 // ------------- //
@@ -60,6 +66,7 @@ mario__struct = {
     "y":                  0x40,  // dword (float)
     "z":                  0x44,  // dword (float)
     "interaction object": 0x78,  // dword (pointer to object)
+    "held object":        0x7C,  // dword (pointer to object)
     "mario object":       0x88,  // dword (pointer to object)
     "nof stars (hud)":    0xa8,  // word
     "hp":                 0xac,  // byte / word
@@ -80,6 +87,11 @@ function pos_x() => dword(mario_field("x"))
 function pos_y() => dword(mario_field("y"))
 function pos_z() => dword(mario_field("z"))
 
+function pos_x_float() => float(mario_field("x"))
+function pos_y_float() => float(mario_field("y"))
+function pos_z_float() => float(mario_field("z"))
+
+function held_object() => tbyte(mario_field("held object"))
 function mario_object() => tbyte(mario_field("mario object"))
 
 function hp_int() => byte(mario_field("hp") + 1)
@@ -156,6 +168,8 @@ level_id__values = {
     "End Cake":       0x19,
 }
 
+function level_changed() => just_changed_any(level_id__mem)
+
 function in_level(name) => level_id__mem == level_id__values[name]
 function in_level_(name) => byte(0x32ddfa) == level_id__values[name]
 function just_entered_level(name) => just_changed_to(level_id__mem, level_id__values[name])
@@ -183,7 +197,7 @@ star_names = {
     "Course 2": ["Pillars and Hills"         , "Enchanted Road Parts Trip"         , "The Path of the Bullet Hell",
                  "Explore the Village Inside", "Reds Drowned in the Quicksand"     , "The Secret of the Old House"],
     "Course 3": ["Rooftop Darkness"          , "An Old Enemy's Resting Spot"       , "Deceiving Walls",
-                 "Precise Wallkicking Test"  , "Journey to the Fiery Undergrounds" , "Conquer the Viscious Room", "Red Coins of a Forgotten Reality"],
+                 "Precise Wallkicking Test"  , "Journey to the Fiery Undergrounds" , "Conquer the Vicious Room", "Red Coins of a Forgotten Reality"],
     "Course 4": ["Speedy Spindrift"          , "Nice VSC at the End"               , "Blue-Brick Slope Fortress",
                  "Blue-Brick Ascension"      , "Lonely Secret"                     ],
     "Course 5": ["What's in a Pool?"         , "Sliding and Kicking"               , "Above the Water",
@@ -247,6 +261,8 @@ behaviour_script__values = {
     
     "secret":                 0x8011C3DC,
     "red coin":               0x8011C36C,
+    
+    "chuckya":                0x801189E8,
 }
 
 function object_is_active(addr) => word(object_field(addr, "active")) == 0x0101
@@ -439,6 +455,13 @@ function course_stars_achievements() {
             
             id = course_stars_meta[course_key]["ids"][star_index - 1]
             badge = format("{0}", course_stars_meta[course_key]["badge_ids"][star_index - 1])
+            
+            if (course_index == 3 && star_index == 6) {
+                description = description + " (No grabbing Chuckya or BLJ on roof)"
+                trigger = unless(once(object_is(held_object(), "chuckya") && never(level_changed())))
+                    && unless(once(pos_z_float() < -2048.0 && pos_y_float() > 6864.0 && mario_anim_is("long jump") && never(level_changed())))
+                && trigger
+            }
 
             achievement(
                 id=id,
@@ -457,7 +480,7 @@ course_stars_achievements()
 // Cap Switch Triathlon's the only non-course I'm considering
 
 non_course_stars_meta = {
-    "Caps":     stars_meta([4, 3, 10, 5, 5, 4], range(179606, 179611), range(199990, 199995)),
+    "Caps":     stars_meta([5, 3, 10, 5, 5, 4], range(179606, 179611), range(199990, 199995)),
 }
 
 function non_course_star_achievements(course_key, star_cheevos) {
@@ -539,22 +562,32 @@ achievement(
     points = 3, trigger = all_overworld_signs_trigger()
 )
 
-castle_top_y = 0x45D68000
-
-function box_snipe_trigger()
-{
-    cond = never(!in_level("Course 3"))
-    cond = cond && once(pos_z() > 0xC5000000 && pos_y() > castle_top_y && pos_y() < 0x80000000) // on top of castle
-    cond = cond && never(pos_y() <= castle_top_y && !airborne()) // just below castle
-    cond = cond && never(pos_y() > 0x80000000   && !airborne()) // negative floats
-    cond = cond && trigger_when(wearing_metal_cap() == 1)
-    return cond
-}
+//castle_top_y = 0x45D68000
+//
+//function box_snipe_trigger()
+//{
+//    cond = never(!in_level("Course 3"))
+//    cond = cond && once(pos_z() > 0xC5000000 && pos_y() > castle_top_y && pos_y() < 0x80000000) // on top of castle
+//    cond = cond && never(pos_y() <= castle_top_y && !airborne()) // just below castle
+//    cond = cond && never(pos_y() > 0x80000000   && !airborne()) // negative floats
+//    cond = cond && trigger_when(wearing_metal_cap() == 1)
+//    return cond
+//}
+//
+//achievement(
+//    id = 179613, badge = "199997",
+//    title = "Box Snipe from Above", description = "In Course 3, jump from the top of the castle and collect a metal cap before hitting the ground",
+//    points = 5, trigger = box_snipe_trigger()
+//)
 
 achievement(
-    id = 179613, badge = "199997",
-    title = "Box Snipe from Above", description = "In Course 3, jump from the top of the castle and collect a metal cap before hitting the ground",
-    points = 5, trigger = box_snipe_trigger()
+    id = 179613, badge="421730",
+    title = "Swimming in the Vicious Room",
+    description = "In Course 3, swim into an invisible water box in the star 6 area.",
+    points = 4,
+    trigger = in_level("Course 3")
+        && swimming() != 0
+        && pos_y_float() < 1000.0
 )
 
 function wing_cap_tour_trigger()
@@ -727,12 +760,12 @@ level__lookup = rich_presence_lookup("LevelAction", level_id__mem, {
 }, "in an unbeknownst location")
 
 stars__value = rich_presence_value("Number", nof_stars())
-deaths__value = rich_presence_value("Number", measured(mario_anim_changed_to("death respawn"))) // screw you compiler, I do what I want
+//deaths__value = rich_presence_value("Number", measured(mario_anim_changed_to("death respawn"))) // screw you compiler, I do what I want
 
-rich_presence_conditional_display(
-    in_game(),
-    "Mario is {0} [⭐{1}/45] [Deaths this session: {2}]", level__lookup, stars__value, deaths__value
-)
+//rich_presence_conditional_display(
+//    in_game(),
+//    "Mario is {0} [⭐{1}/45] [Deaths this session: {2}]", level__lookup, stars__value, deaths__value
+//)
 
 rich_presence_display("Mario is getting ready for another extreme adventure")
 
