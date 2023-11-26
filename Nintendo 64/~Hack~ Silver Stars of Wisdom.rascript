@@ -1008,7 +1008,7 @@ function course_star_achievements() {
                 
                 desc = ""
                 if (is_numbered_course(course)) {
-                    base_desc = "Collect the {0} in {1}."
+                    base_desc = "Collect {0} in {1}."
                     if (i == 6) { // star 7
                         star_str = "the 100 coin star"
                         if (any_of(["Course 11", "Course 13", "Course 14"], a => course == a))

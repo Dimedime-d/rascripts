@@ -971,7 +971,7 @@ function course_star_achievements(disable_ids=0) {
                 
                 desc = ""
                 if (is_numbered_course(course)) {
-                    base_desc = "Collect the {0} in {1}."
+                    base_desc = "Collect {0} in {1}."
                     if (i == 6) { // star 7
                         star_str = "the bonus star"
                         if (course == "Course 3")
